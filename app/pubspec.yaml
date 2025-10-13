@@ -1,0 +1,63 @@
+name: mapguaru
+description: Seu guia digital completo e acessível para os serviços públicos de Guarulhos."
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Banco de dados SQL (SQLite)
+  sqflite: ^2.3.3
+  path: ^1.8.3
+
+  # Firebase -
+  # firebase_core: ^4.1.1
+  # firebase_auth: ^6.1.0
+  # cloud_firestore: ^6.0.2
+
+  # Mapa (OpenStreetMap via flutter_map)
+  flutter_map: ^8.2.2 # Pacote de mapas open-source
+  latlong2: ^0.9.0 # Dependência para coordenadas do flutter_map
+
+  # Gerenciamento de estado
+  provider: ^6.1.02
+  
+  # Criptografia para senhas
+  crypto: ^3.0.3
+  
+  # Ícones
+  cupertino_icons: ^1.0.6
+  
+  # HTTP requests (se necessário)
+  http: ^1.1.0
+  
+  # Shared Preferences para dados simples
+  shared_preferences: ^2.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+
+  assets:
+    - assets/images/
+    - assets/icons/
+
+  # Para adicionar a fonte Helvetica
+  # 1. Crie uma pasta 'assets' na raiz do seu projeto.
+  # 2. Dentro de 'assets', crie uma pasta 'fonts'.
+  # 3. Coloque o arquivo Helvetica.ttf dentro de 'assets/fonts/'.
+  fonts:
+    - family: Helvetica
+      fonts:
+        - asset: assets/fonts/Helvetica.ttf
+        - asset: assets/fonts/Helvetica-Bold.ttf
+          weight: 700

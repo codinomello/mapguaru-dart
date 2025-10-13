@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "548161049509",
+    "project_id": "mapguaru-dart",
+    "storage_bucket": "mapguaru-dart.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:548161049509:android:cfa888cc901072c1014e4c",
+        "android_client_info": {
+          "package_name": "com.mapguaru.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOUuIDiTApe607zO4bu2mELqWiEzq5x8w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
