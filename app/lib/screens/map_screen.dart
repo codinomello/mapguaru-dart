@@ -110,7 +110,9 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ],
       ),
-      body: _isLoading
+      body: SafeArea(
+        top: false,
+        child: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Stack(
               children: [
@@ -195,6 +197,7 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ],
             ),
+      ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [

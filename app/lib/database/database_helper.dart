@@ -208,7 +208,7 @@ class DatabaseHelper {
     final db = await database;
     // Junta as tabelas favorites e service_units para obter detalhes completos
     return await db.rawQuery('''
-      SELECT u.* FROM service_units u
+      SELECT u.* FROM ser vice_units u
       INNER JOIN favorites f ON u.unit_id = f.unit_id
       WHERE f.user_id = ?
     ''', [userId]);
