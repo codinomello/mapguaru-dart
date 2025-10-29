@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../database/database_helper.dart';
-import '../models/models.dart';
+import '../models/service_unit_model.dart';
 import '../utils/constants.dart';
 import '../utils/theme.dart';
 import '../main.dart';
@@ -131,7 +131,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: AppTheme.background,
+          fillColor: Theme.of(context).scaffoldBackgroundColor,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 12,
@@ -189,20 +189,20 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                       children: [
                         Text(
                           unit.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Helvetica',
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: AppTheme.textPrimary,
+                            color: Theme.of(context).textTheme.titleLarge?.color,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           unit.neighborhood ?? unit.address,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Helvetica',
                             fontSize: 13,
-                            color: AppTheme.textSecondary,
+                            color: Theme.of(context).textTheme.bodyMedium?.color,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -216,7 +216,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                     IconButton(
                       icon: Icon(
                         isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: isFavorite ? Colors.red : AppTheme.textLight,
+                        color: isFavorite ? Colors.red : Theme.of(context).iconTheme.color,
                       ),
                       onPressed: () async {
                         await favoritesProvider.toggleFavorite(
@@ -257,18 +257,18 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.access_time,
                             size: 16,
-                            color: AppTheme.textSecondary,
+                            color: Theme.of(context).textTheme.bodyMedium?.color,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             unit.openingHours!,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Helvetica',
                               fontSize: 12,
-                              color: AppTheme.textSecondary,
+                              color: Theme.of(context).textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -277,18 +277,18 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.phone,
                             size: 16,
-                            color: AppTheme.textSecondary,
+                            color: Theme.of(context).textTheme.bodyMedium?.color,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             unit.phone!,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Helvetica',
                               fontSize: 12,
-                              color: AppTheme.textSecondary,
+                              color: Theme.of(context).textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -329,7 +329,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: AppTheme.textLight,
+                      color: Theme.of(context).iconTheme.color,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -339,11 +339,11 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                 // Nome
                 Text(
                   unit.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Helvetica',
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.textPrimary,
+                    color: Theme.of(context).textTheme.titleLarge?.color,
                   ),
                 ),
                 
@@ -351,10 +351,10 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                   const SizedBox(height: 12),
                   Text(
                     unit.description!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Helvetica',
                       fontSize: 14,
-                      color: AppTheme.textSecondary,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   ),
                 ],
@@ -446,20 +446,20 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Helvetica',
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.textSecondary,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Helvetica',
                     fontSize: 14,
-                    color: AppTheme.textPrimary,
+                    color: Theme.of(context).textTheme.titleLarge?.color,
                   ),
                 ),
               ],
@@ -481,28 +481,28 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
             Icon(
               Icons.search_off,
               size: 80,
-              color: AppTheme.textLight,
+              color: Theme.of(context).iconTheme.color,
             ),
             const SizedBox(height: 16),
             Text(
               _searchQuery.isEmpty
                   ? 'Nenhuma unidade encontrada'
                   : 'Nenhum resultado para "$_searchQuery"',
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Helvetica',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textSecondary,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Tente buscar por outro termo',
               style: TextStyle(
                 fontFamily: 'Helvetica',
                 fontSize: 14,
-                color: AppTheme.textLight,
+                color: Theme.of(context).iconTheme.color,
               ),
               textAlign: TextAlign.center,
             ),

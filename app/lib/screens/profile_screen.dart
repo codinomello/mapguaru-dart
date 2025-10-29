@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../database/database_helper.dart';
-import '../models/models.dart';
+import '../models/service_unit_model.dart';
 import '../utils/constants.dart';
 import '../utils/theme.dart';
 import '../main.dart';
@@ -224,13 +224,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Informações da Conta',
             style: TextStyle(
               fontFamily: 'Helvetica',
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: Theme.of(context).textTheme.titleLarge?.color,
             ),
           ),
           const SizedBox(height: 12),
@@ -240,21 +240,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.person_outline),
-                  title: const Text(
+                  title: Text(
                     'Nome',
                     style: TextStyle(
                       fontFamily: 'Helvetica',
                       fontSize: 12,
-                      color: AppTheme.textSecondary,
+                      color: Theme.of(context).textTheme.bodyMedium?.color
                     ),
                   ),
                   subtitle: Text(
                     userProvider.userName ?? '-',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Helvetica',
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
                     ),
                   ),
                   trailing: IconButton(
@@ -265,42 +265,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.email_outlined),
-                  title: const Text(
+                  title:  Text(
                     'E-mail',
                     style: TextStyle(
                       fontFamily: 'Helvetica',
                       fontSize: 12,
-                      color: AppTheme.textSecondary,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   ),
                   subtitle: Text(
                     userProvider.userEmail ?? '-',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Helvetica',
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
                     ),
                   ),
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.lock_outline),
-                  title: const Text(
+                  title: Text(
                     'Senha',
                     style: TextStyle(
                       fontFamily: 'Helvetica',
                       fontSize: 12,
-                      color: AppTheme.textSecondary,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   ),
-                  subtitle: const Text(
+                  subtitle: Text(
                     '••••••••',
                     style: TextStyle(
                       fontFamily: 'Helvetica',
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
                     ),
                   ),
                   trailing: IconButton(
@@ -332,13 +332,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Row(
             children: [
-              const Text(
+              Text(
                 'Meus Favoritos',
                 style: TextStyle(
                   fontFamily: 'Helvetica',
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
+                  color: Theme.of(context).textTheme.titleLarge?.color,
                 ),
               ),
               const Spacer(),
@@ -365,15 +365,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Icon(
                         Icons.favorite_border,
                         size: 48,
-                        color: AppTheme.textLight,
+                        color: Theme.of(context).iconTheme.color,
                       ),
                       const SizedBox(height: 12),
-                      const Text(
+                      Text(
                         'Nenhum favorito ainda',
                         style: TextStyle(
                           fontFamily: 'Helvetica',
                           fontSize: 14,
-                          color: AppTheme.textSecondary,
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
                         ),
                       ),
                     ],
@@ -460,13 +460,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+           Text(
             'Documentos Necessários',
             style: TextStyle(
               fontFamily: 'Helvetica',
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: Theme.of(context).textTheme.titleLarge?.color,
             ),
           ),
           const SizedBox(height: 12),
@@ -501,7 +501,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           
           Card(
             color: AppTheme.info.withOpacity(0.1),
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.all(16),
               child: Row(
                 children: [
@@ -516,7 +516,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: TextStyle(
                         fontFamily: 'Helvetica',
                         fontSize: 12,
-                        color: AppTheme.textSecondary,
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                     ),
                   ),
@@ -538,19 +538,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Helvetica',
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: AppTheme.textPrimary,
+          color: Theme.of(context).textTheme.titleLarge?.color,
         ),
       ),
       subtitle: Text(
         description,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Helvetica',
           fontSize: 12,
-          color: AppTheme.textSecondary,
+          color: Theme.of(context).textTheme.bodyMedium?.color,
         ),
       ),
     );

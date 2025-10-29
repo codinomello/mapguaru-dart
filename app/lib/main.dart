@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mapguaru/services/geonetwork_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'database/database_helper.dart';
+import 'services/auth_service.dart';
+import 'services/theme_service.dart';
 import 'utils/theme.dart';
 import 'utils/constants.dart';
 import 'screens/splash_screen.dart';
@@ -15,54 +19,129 @@ import 'screens/category_detail_screen.dart';
 import 'screens/map_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/service_guide_screen.dart';
+import 'firebase_options.dart';
 
-/// Ponto de entrada do aplicativo MapGuaru
-/// 
-/// Inicializa o banco de dados, configurações e providers
-/// antes de executar o app
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Configurar orientação (apenas retrato)
+
+  // 🔥 Inicializa o Firebase (com tratamento de erro)
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint('Erro ao inicializar Firebase: $e');
+  }
+
+  // 🔒 Bloqueia a orientação do app em retrato
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  
-  // Inicializar banco de dados e popular com dados de exemplo
+
+  // 🧩 Inicializa banco local e dados da API
   final dbHelper = DatabaseHelper();
-  await _initializeSampleData(dbHelper);
-  
+  await _initializeDataFromAPI(dbHelper); // 🆕 NOVA FUNÇÃO
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+        ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const MapGuaruApp(),
     ),
   );
 }
 
-/// Inicializa dados de exemplo no banco de dados
-/// 
-/// Verifica se é a primeira execução e popula o banco
-/// com unidades de serviço de exemplo
-Future<void> _initializeSampleData(DatabaseHelper dbHelper) async {
+/// 🆕 NOVA FUNÇÃO: Carrega dados reais da API do GeoServer
+Future<void> _initializeDataFromAPI(DatabaseHelper dbHelper) async {
   final prefs = await SharedPreferences.getInstance();
   final isFirstTime = prefs.getBool(AppConstants.keyFirstTime) ?? true;
+  final lastUpdate = prefs.getString(AppConstants.keyLastDataUpdate);
   
-  if (isFirstTime) {
-    // Inserir unidades de serviço de exemplo
-    for (var unit in AppConstants.sampleServiceUnits) {
-      await dbHelper.insertServiceUnit(unit);
+  // Define se precisa atualizar (primeira vez ou passaram mais de 7 dias)
+  bool needsUpdate = isFirstTime;
+  
+  if (!isFirstTime && lastUpdate != null) {
+    final lastUpdateDate = DateTime.parse(lastUpdate);
+    final daysSinceUpdate = DateTime.now().difference(lastUpdateDate).inDays;
+    needsUpdate = daysSinceUpdate > 7; // Atualiza a cada 7 dias
+  }
+
+  if (needsUpdate) {
+    debugPrint('🔄 Atualizando dados da API do GeoServer...');
+    
+    try {
+      // 1️⃣ Primeiro, tenta buscar camadas disponíveis
+      final availableLayers = await GeoNetworkService.getWMSLayers();
+      debugPrint('📋 Camadas disponíveis: ${availableLayers.join(", ")}');
+      
+      // 2️⃣ Busca todos os dados das camadas
+      final units = await GeoNetworkService.fetchAllServiceUnits();
+      
+      if (units.isNotEmpty) {
+        // 3️⃣ Limpa dados antigos (opcional - pode causar perda de favoritos)
+        // await dbHelper.clearAllServiceUnits();
+        
+        // 4️⃣ Insere novos dados
+        int insertedCount = 0;
+        for (var unit in units) {
+          try {
+            await dbHelper.insertServiceUnit(unit);
+            insertedCount++;
+          } catch (e) {
+            debugPrint('⚠️ Erro ao inserir unidade: $e');
+          }
+        }
+        
+        debugPrint('✅ $insertedCount unidades inseridas no banco local');
+        
+        // 5️⃣ Atualiza data da última sincronização
+        await prefs.setString(
+          AppConstants.keyLastDataUpdate, 
+          DateTime.now().toIso8601String(),
+        );
+      } else {
+        debugPrint('⚠️ Nenhum dado foi retornado da API');
+        
+        // Se for primeira vez e não conseguiu dados, usa dados de exemplo
+        if (isFirstTime) {
+          debugPrint('📦 Usando dados de exemplo como fallback...');
+          await _insertSampleData(dbHelper);
+        }
+      }
+      
+    } catch (e) {
+      debugPrint('❌ Erro ao buscar dados da API: $e');
+      
+      // Se for primeira vez e houve erro, usa dados de exemplo
+      if (isFirstTime) {
+        debugPrint('📦 Usando dados de exemplo como fallback...');
+        await _insertSampleData(dbHelper);
+      }
     }
     
     await prefs.setBool(AppConstants.keyFirstTime, false);
+  } else {
+    debugPrint('✓ Dados já estão atualizados');
   }
 }
 
-/// Widget raiz do aplicativo
+/// Fallback: insere dados de exemplo se API falhar
+Future<void> _insertSampleData(DatabaseHelper dbHelper) async {
+  for (var unit in AppConstants.sampleServiceUnits) {
+    try {
+      await dbHelper.insertServiceUnit(unit);
+    } catch (e) {
+      debugPrint('⚠️ Erro ao inserir dado de exemplo: $e');
+    }
+  }
+  debugPrint('✅ Dados de exemplo inseridos');
+}
+
 class MapGuaruApp extends StatelessWidget {
   const MapGuaruApp({super.key});
 
@@ -72,11 +151,7 @@ class MapGuaruApp extends StatelessWidget {
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      
-      // Rota inicial
       initialRoute: AppConstants.routeSplash,
-      
-      // Definição de rotas
       routes: {
         AppConstants.routeSplash: (context) => const SplashScreen(),
         AppConstants.routeMenu: (context) => const MenuScreen(),
@@ -87,8 +162,6 @@ class MapGuaruApp extends StatelessWidget {
         AppConstants.routeProfile: (context) => const ProfileScreen(),
         AppConstants.routeServiceGuide: (context) => const ServiceGuideScreen(),
       },
-      
-      // Rota com argumentos
       onGenerateRoute: (settings) {
         if (settings.name == AppConstants.routeCategory) {
           final args = settings.arguments as Map<String, dynamic>;
@@ -105,12 +178,6 @@ class MapGuaruApp extends StatelessWidget {
   }
 }
 
-// ==================== PROVIDERS ====================
-
-/// Provider para gerenciar estado do usuário
-/// 
-/// Mantém informações do usuário logado e fornece
-/// métodos para login/logout
 class UserProvider with ChangeNotifier {
   int? _userId;
   String? _userName;
@@ -122,7 +189,7 @@ class UserProvider with ChangeNotifier {
   String? get userEmail => _userEmail;
   bool get isLoggedIn => _isLoggedIn;
 
-  /// Carrega dados do usuário do SharedPreferences
+  /// 🔹 Carrega dados locais do usuário
   Future<void> loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     _userId = prefs.getInt(AppConstants.keyUserId);
@@ -132,41 +199,44 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Faz login do usuário
+  /// 🔹 Login persistente
   Future<void> login(int userId, String name, String email) async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     _userId = userId;
     _userName = name;
     _userEmail = email;
     _isLoggedIn = true;
-    
+
     await prefs.setInt(AppConstants.keyUserId, userId);
     await prefs.setString(AppConstants.keyUserName, name);
     await prefs.setString(AppConstants.keyUserEmail, email);
     await prefs.setBool(AppConstants.keyIsLoggedIn, true);
-    
+
     notifyListeners();
   }
 
-  /// Faz logout do usuário
+  /// 🔹 Logout completo
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     _userId = null;
     _userName = null;
     _userEmail = null;
     _isLoggedIn = false;
-    
+
     await prefs.remove(AppConstants.keyUserId);
     await prefs.remove(AppConstants.keyUserName);
     await prefs.remove(AppConstants.keyUserEmail);
     await prefs.setBool(AppConstants.keyIsLoggedIn, false);
-    
+
+    // Sai também do Firebase
+    await FirebaseAuth.instance.signOut();
+
     notifyListeners();
   }
 
-  /// Atualiza nome do usuário
+  /// 🔹 Atualiza nome local
   Future<void> updateName(String newName) async {
     final prefs = await SharedPreferences.getInstance();
     _userName = newName;
@@ -175,16 +245,11 @@ class UserProvider with ChangeNotifier {
   }
 }
 
-/// Provider para gerenciar favoritos
-/// 
-/// Mantém lista de unidades favoritadas e fornece
-/// métodos para adicionar/remover favoritos
 class FavoritesProvider with ChangeNotifier {
   final List<int> _favoriteIds = [];
-  
+
   List<int> get favoriteIds => _favoriteIds;
 
-  /// Carrega favoritos do banco de dados
   Future<void> loadFavorites(int userId) async {
     final dbHelper = DatabaseHelper();
     final favorites = await dbHelper.getUserFavorites(userId);
@@ -193,15 +258,11 @@ class FavoritesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Verifica se uma unidade está nos favoritos
-  bool isFavorite(int unitId) {
-    return _favoriteIds.contains(unitId);
-  }
+  bool isFavorite(int unitId) => _favoriteIds.contains(unitId);
 
-  /// Adiciona/remove favorito
   Future<void> toggleFavorite(int userId, int unitId) async {
     final dbHelper = DatabaseHelper();
-    
+
     if (_favoriteIds.contains(unitId)) {
       await dbHelper.removeFavorite(userId, unitId);
       _favoriteIds.remove(unitId);
@@ -209,11 +270,10 @@ class FavoritesProvider with ChangeNotifier {
       await dbHelper.addFavorite(userId, unitId);
       _favoriteIds.add(unitId);
     }
-    
+
     notifyListeners();
   }
 
-  /// Limpa todos os favoritos (usado no logout)
   void clearFavorites() {
     _favoriteIds.clear();
     notifyListeners();

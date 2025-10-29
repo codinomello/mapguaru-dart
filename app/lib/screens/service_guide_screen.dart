@@ -34,26 +34,31 @@ class ServiceGuideScreen extends StatelessWidget {
                   'Escolha uma Categoria',
                   'Selecione entre Saúde, Educação, Comunidade, Segurança, Transporte ou Cultura & Lazer',
                   AppTheme.primaryColor,
+                  context,
                 ),
                 _buildStepCard(
                   '2',
                   'Explore os Locais',
                   'Veja a lista de unidades disponíveis com endereços e informações de contato',
                   AppTheme.accentColor,
+                  context,
                 ),
                 _buildStepCard(
                   '3',
                   'Visualize no Mapa',
                   'Use o mapa interativo para ver a localização exata e encontrar o caminho',
                   AppTheme.success,
+                  context,
                 ),
                 _buildStepCard(
                   '4',
                   'Salve seus Favoritos',
                   'Faça login e adicione seus locais favoritos para acesso rápido',
                   Colors.red,
+                  context,
                 ),
               ],
+              context,
             ),
             
             const SizedBox(height: 24),
@@ -68,8 +73,10 @@ class ServiceGuideScreen extends StatelessWidget {
                   categoryId,
                   AppConstants.categoryNames[categoryId]!,
                   AppConstants.categoryDescriptions[categoryId]!,
+                  context,
                 );
               }),
+              context,
             ),
             
             const SizedBox(height: 24),
@@ -83,29 +90,34 @@ class ServiceGuideScreen extends StatelessWidget {
                   'Verifique o Horário',
                   'Sempre confira o horário de funcionamento antes de ir',
                   Icons.access_time,
+                  context,
                 ),
                 _buildTipCard(
                   'Leve Documentos',
                   'Tenha seus documentos pessoais em mãos',
                   Icons.description,
+                  context,
                 ),
                 _buildTipCard(
                   'Use o Telefone',
                   'Ligue antes para confirmar atendimento e tirar dúvidas',
                   Icons.phone,
+                  context,
                 ),
                 _buildTipCard(
                   'Favorite os Locais',
                   'Adicione aos favoritos os serviços que você mais usa',
                   Icons.favorite,
+                  context,
                 ),
               ],
+              context,
             ),
             
             const SizedBox(height: 24),
             
             // Contato
-            _buildContactCard(),
+            _buildContactCard(context),
             
             const SizedBox(height: 24),
           ],
@@ -182,7 +194,7 @@ class ServiceGuideScreen extends StatelessWidget {
   }
 
   /// Constrói seção com título
-  Widget _buildSection(String title, IconData icon, List<Widget> children) {
+  Widget _buildSection(String title, IconData icon, List<Widget> children, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -192,11 +204,11 @@ class ServiceGuideScreen extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Helvetica',
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
+                color: Theme.of(context).textTheme.titleLarge?.color,
               ),
             ),
           ],
@@ -208,7 +220,7 @@ class ServiceGuideScreen extends StatelessWidget {
   }
 
   /// Constrói card de passo
-  Widget _buildStepCard(String number, String title, String description, Color color) {
+  Widget _buildStepCard(String number, String title, String description, Color color, BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -242,20 +254,20 @@ class ServiceGuideScreen extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Helvetica',
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     description,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Helvetica',
                       fontSize: 13,
-                      color: AppTheme.textSecondary,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   ),
                 ],
@@ -268,7 +280,7 @@ class ServiceGuideScreen extends StatelessWidget {
   }
 
   /// Constrói card de categoria
-  Widget _buildCategoryCard(int categoryId, String name, String description) {
+  Widget _buildCategoryCard(int categoryId, String name, String description, BuildContext context) {
     final color = AppTheme.getCategoryColor(categoryId);
     final icon = AppTheme.getCategoryIcon(
       ['health', 'education', 'community', 'security', 'transport', 'culture'][categoryId - 1],
@@ -300,20 +312,20 @@ class ServiceGuideScreen extends StatelessWidget {
                 children: [
                   Text(
                     name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Helvetica',
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     description,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Helvetica',
                       fontSize: 13,
-                      color: AppTheme.textSecondary,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   ),
                 ],
@@ -326,7 +338,7 @@ class ServiceGuideScreen extends StatelessWidget {
   }
 
   /// Constrói card de dica
-  Widget _buildTipCard(String title, String description, IconData icon) {
+  Widget _buildTipCard(String title, String description, IconData icon, context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -353,20 +365,20 @@ class ServiceGuideScreen extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Helvetica',
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     description,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Helvetica',
                       fontSize: 13,
-                      color: AppTheme.textSecondary,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   ),
                 ],
@@ -379,7 +391,7 @@ class ServiceGuideScreen extends StatelessWidget {
   }
 
   /// Constrói card de contato
-  Widget _buildContactCard() {
+  Widget _buildContactCard(BuildContext context) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -390,7 +402,7 @@ class ServiceGuideScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
                 Icon(Icons.support_agent, color: AppTheme.primaryColor),
                 SizedBox(width: 8),
@@ -400,18 +412,18 @@ class ServiceGuideScreen extends StatelessWidget {
                     fontFamily: 'Helvetica',
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.textPrimary,
+                    color: Theme.of(context).textTheme.titleLarge?.color,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Entre em contato com a Prefeitura de Guarulhos para mais informações sobre os serviços:',
               style: TextStyle(
                 fontFamily: 'Helvetica',
                 fontSize: 14,
-                color: AppTheme.textSecondary,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
               ),
             ),
             const SizedBox(height: 16),
@@ -419,18 +431,21 @@ class ServiceGuideScreen extends StatelessWidget {
               Icons.phone,
               'Telefone',
               '156 (SAC Guarulhos)',
+              context,
             ),
             const SizedBox(height: 12),
             _buildContactItem(
               Icons.language,
               'Website',
               'www.guarulhos.sp.gov.br',
+              context,
             ),
             const SizedBox(height: 12),
             _buildContactItem(
               Icons.email,
               'E-mail',
               'atendimento@guarulhos.sp.gov.br',
+              context,
             ),
           ],
         ),
@@ -439,7 +454,7 @@ class ServiceGuideScreen extends StatelessWidget {
   }
 
   /// Constrói item de contato
-  Widget _buildContactItem(IconData icon, String label, String value) {
+  Widget _buildContactItem(IconData icon, String label, String value, BuildContext context) {
     return Row(
       children: [
         Icon(
@@ -453,19 +468,19 @@ class ServiceGuideScreen extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Helvetica',
                 fontSize: 12,
-                color: AppTheme.textSecondary,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
               ),
             ),
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Helvetica',
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
+                color: Theme.of(context).textTheme.titleLarge?.color,
               ),
             ),
           ],
