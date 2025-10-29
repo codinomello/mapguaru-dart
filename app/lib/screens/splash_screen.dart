@@ -5,7 +5,7 @@ import '../utils/theme.dart';
 import '../main.dart';
 
 /// Tela de splash exibida ao iniciar o aplicativo
-/// 
+///
 /// Mostra o logo do MapGuaru e navega automaticamente
 /// para a próxima tela após 2 segundos
 class SplashScreen extends StatefulWidget {
@@ -15,33 +15,29 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> 
+class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
+  // Animação de escala removida para um efeito mais suave
 
   @override
   void initState() {
     super.initState();
-    
-    // Configurar animações
+
+    // Configurar animação de fade
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1200), // Duração suave
       vsync: this,
     );
-    
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
-    
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-    );
-    
+
     // Iniciar animação
     _controller.forward();
-    
+
     // Navegar para próxima tela
     _navigateToNext();
   }
@@ -50,9 +46,9 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _navigateToNext() async {
     // Carregar dados do usuário
     await Provider.of<UserProvider>(context, listen: false).loadUserData();
-    
+
     await Future.delayed(const Duration(seconds: 2));
-    
+
     if (mounted) {
       Navigator.of(context).pushReplacementNamed(AppConstants.routeMenu);
     }
@@ -67,68 +63,60 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.primaryColor,
+      // Fundo consistente com o tema do app
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Center(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Opacity(
-              opacity: _fadeAnimation.value,
-              child: Transform.scale(
-                scale: _scaleAnimation.value,
-                child: child,
-              ),
-            );
-          },
+        child: FadeTransition(
+          opacity: _fadeAnimation,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Ícone do mapa
+              // Ícone no estilo do app
               Container(
-                width: 120,
-                height: 120,
+                width: 100,
+                height: 100,
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
+                  color: AppTheme.primaryColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.map,
-                  size: 60,
+                  Icons.map, // Ícone principal
+                  size: 50,
                   color: AppTheme.primaryColor,
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
-              // Nome do app
-              const Text(
+
+              // Nome do app com cor de texto primária
+              Text(
                 AppConstants.appName,
                 style: TextStyle(
                   fontFamily: 'Helvetica',
-                  fontSize: 36,
+                  fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Theme.of(context).textTheme.titleLarge?.color,
                 ),
               ),
-              
+
               const SizedBox(height: 8),
-              
-              // Tagline
-              const Text(
+
+              // Tagline com cor de texto secundária
+              Text(
                 AppConstants.appTagline,
                 style: TextStyle(
                   fontFamily: 'Helvetica',
                   fontSize: 16,
-                  color: Colors.white70,
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
                 ),
                 textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 48),
+
+              // Indicador de carregamento
+              const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
               ),
             ],
           ),

@@ -10,34 +10,45 @@ dependencies:
   flutter:
     sdk: flutter
 
+  
   # Banco de dados SQL (SQLite)
-  sqflite: ^2.3.3
-  path: ^1.8.3
+  sqflite: any
+  path: any
+
+  # Firebase (Core e Autenticação)
+  firebase_core: any
+  firebase_auth: any
+  
+  # Biometria
+  local_auth: ^3.0.0
 
   # Mapa (OpenStreetMap via flutter_map)
-  flutter_map: ^8.2.2 # Pacote de mapas open-source
-  latlong2: ^0.9.0 # Dependência para coordenadas do flutter_map
+  flutter_map: any # Pacote de mapas open-source
+  latlong2: any # Dependência para coordenadas do flutter_map
 
   # Gerenciamento de estado
-  provider: ^6.1.02
+  provider: any
   
   # Criptografia para senhas
-  crypto: ^3.0.3
+  crypto: any
   
   # Ícones
-  cupertino_icons: ^1.0.6
+  cupertino_icons: any
   
   # HTTP requests (se necessário)
-  http: ^1.1.0
+  http: any
+  
+  # XML
+  xml: any
   
   # Shared Preferences para dados simples
-  shared_preferences: ^2.2.2
+  shared_preferences: any
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
-  flutter_launcher_icons: ^0.14.4
+  flutter_lints: any
+  flutter_launcher_icons: any
 
 flutter_icons:
   android: true
@@ -50,6 +61,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/metadata/
 
   # Para adicionar a fonte Helvetica
   # 1. Crie uma pasta 'assets' na raiz do seu projeto.

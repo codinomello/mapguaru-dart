@@ -1,0 +1,467 @@
+<gmd:MD_Metadata xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd http://www.isotc211.org/2005/gmx http://www.isotc211.org/2005/gmx/gmx.xsd http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd ">
+<gmd:fileIdentifier>
+<gco:CharacterString>780b35d2-2ed5-40ef-a708-6a6d4a4dee71</gco:CharacterString>
+</gmd:fileIdentifier>
+<gmd:language>
+</gmd:language>
+<gmd:characterSet>
+<gmd:MD_CharacterSetCode codeListValue="utf8" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode"/>
+</gmd:characterSet>
+<gmd:contact>
+<gmd:CI_ResponsibleParty>
+<gmd:individualName>
+<gco:CharacterString>Divisão de Geoprocessamento</gco:CharacterString>
+</gmd:individualName>
+<gmd:organisationName>
+<gco:CharacterString>
+DIT - DEPARTAMENTO DE INFORMÁTICA E TELECOMUNICAÇÕES
+</gco:CharacterString>
+</gmd:organisationName>
+<gmd:positionName>
+<gco:CharacterString>
+Seção Técnica de Acompanhamento e Normatização de Informações
+</gco:CharacterString>
+</gmd:positionName>
+<gmd:contactInfo>
+<gmd:CI_Contact>
+<gmd:phone>
+<gmd:CI_Telephone>
+<gmd:voice gco:nilReason="missing">
+<gco:CharacterString/>
+</gmd:voice>
+</gmd:CI_Telephone>
+</gmd:phone>
+<gmd:address>
+<gmd:CI_Address>
+<gmd:deliveryPoint>
+<gco:CharacterString>Avenida Bom Clima, 49</gco:CharacterString>
+</gmd:deliveryPoint>
+<gmd:city>
+<gco:CharacterString>Macedo</gco:CharacterString>
+</gmd:city>
+<gmd:administrativeArea>
+<gco:CharacterString>Guarulhos</gco:CharacterString>
+</gmd:administrativeArea>
+<gmd:postalCode>
+<gco:CharacterString>07196-220</gco:CharacterString>
+</gmd:postalCode>
+<gmd:country>
+<gco:CharacterString>Brasil</gco:CharacterString>
+</gmd:country>
+<gmd:electronicMailAddress>
+<gco:CharacterString>geo@guarulhos.sp.gov.br</gco:CharacterString>
+</gmd:electronicMailAddress>
+</gmd:CI_Address>
+</gmd:address>
+<gmd:onlineResource/>
+</gmd:CI_Contact>
+</gmd:contactInfo>
+<gmd:role>
+<gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode" codeListValue="publisher"/>
+</gmd:role>
+</gmd:CI_ResponsibleParty>
+</gmd:contact>
+<gmd:dateStamp>
+<gco:DateTime>2023-06-21T14:35:54</gco:DateTime>
+</gmd:dateStamp>
+<gmd:metadataStandardName>
+<gco:CharacterString>ISO 19115:2003/19139</gco:CharacterString>
+</gmd:metadataStandardName>
+<gmd:metadataStandardVersion>
+<gco:CharacterString>1.0</gco:CharacterString>
+</gmd:metadataStandardVersion>
+<gmd:referenceSystemInfo>
+<gmd:MD_ReferenceSystem>
+<gmd:referenceSystemIdentifier>
+<gmd:RS_Identifier>
+<gmd:code>
+<gco:CharacterString>SIRGAS2000 / UTM zone 23S (EPSG:31983)</gco:CharacterString>
+</gmd:code>
+</gmd:RS_Identifier>
+</gmd:referenceSystemIdentifier>
+</gmd:MD_ReferenceSystem>
+</gmd:referenceSystemInfo>
+<gmd:identificationInfo>
+<gmd:MD_DataIdentification>
+<gmd:citation>
+<gmd:CI_Citation>
+<gmd:title>
+<gco:CharacterString>Assistência Social</gco:CharacterString>
+</gmd:title>
+<gmd:date>
+<gmd:CI_Date>
+<gmd:date>
+<gco:DateTime>2023-06-15T10:00:00</gco:DateTime>
+</gmd:date>
+<gmd:dateType>
+<gmd:CI_DateTypeCode codeListValue="criation" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode"/>
+</gmd:dateType>
+</gmd:CI_Date>
+</gmd:date>
+<gmd:identifier>
+<gmd:MD_Identifier>
+<gmd:code/>
+</gmd:MD_Identifier>
+</gmd:identifier>
+</gmd:CI_Citation>
+</gmd:citation>
+<gmd:abstract>
+<gco:CharacterString>
+Locais de Assistência Social no municipio de Guarulhos.
+</gco:CharacterString>
+</gmd:abstract>
+<gmd:purpose>
+<gco:CharacterString>Assistência Social</gco:CharacterString>
+</gmd:purpose>
+<gmd:status>
+<gmd:MD_ProgressCode codeListValue="completed" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ProgressCode"/>
+</gmd:status>
+<gmd:pointOfContact>
+<gmd:CI_ResponsibleParty>
+<gmd:individualName gco:nilReason="missing">
+<gco:CharacterString/>
+</gmd:individualName>
+<gmd:organisationName>
+<gco:CharacterString>
+SDAS - SECRETARIA DE DESENVOLVIMENTO E ASSISTÊNCIA SOCIAL
+</gco:CharacterString>
+</gmd:organisationName>
+<gmd:positionName gco:nilReason="missing">
+<gco:CharacterString/>
+</gmd:positionName>
+<gmd:contactInfo>
+<gmd:CI_Contact>
+<gmd:phone>
+<gmd:CI_Telephone>
+<gmd:voice>
+<gco:CharacterString>(11) 2087-7400</gco:CharacterString>
+</gmd:voice>
+<gmd:facsimile>
+<gco:CharacterString>
+Telephone number of a facsimile machine for the responsible organization or individual
+</gco:CharacterString>
+</gmd:facsimile>
+</gmd:CI_Telephone>
+</gmd:phone>
+<gmd:address>
+<gmd:CI_Address>
+<gmd:deliveryPoint>
+<gco:CharacterString>Avenida Guarulhos, 2.200, Vila Augusta,</gco:CharacterString>
+</gmd:deliveryPoint>
+<gmd:city>
+<gco:CharacterString>Guarulhos</gco:CharacterString>
+</gmd:city>
+<gmd:administrativeArea>
+<gco:CharacterString>São Paulo</gco:CharacterString>
+</gmd:administrativeArea>
+<gmd:postalCode>
+<gco:CharacterString>07025-000</gco:CharacterString>
+</gmd:postalCode>
+<gmd:country>
+<gco:CharacterString>Brasil</gco:CharacterString>
+</gmd:country>
+<gmd:electronicMailAddress gco:nilReason="missing">
+<gco:CharacterString/>
+</gmd:electronicMailAddress>
+</gmd:CI_Address>
+</gmd:address>
+</gmd:CI_Contact>
+</gmd:contactInfo>
+<gmd:role>
+<gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode" codeListValue="resourceProvider"/>
+</gmd:role>
+</gmd:CI_ResponsibleParty>
+</gmd:pointOfContact>
+<gmd:resourceMaintenance>
+<gmd:MD_MaintenanceInformation>
+<gmd:maintenanceAndUpdateFrequency>
+<gmd:MD_MaintenanceFrequencyCode codeListValue="asNeeded" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_MaintenanceFrequencyCode"/>
+</gmd:maintenanceAndUpdateFrequency>
+</gmd:MD_MaintenanceInformation>
+</gmd:resourceMaintenance>
+<gmd:graphicOverview>
+<gmd:MD_BrowseGraphic>
+<gmd:fileName>
+<gco:CharacterString>
+https://geonetwork.guarulhos.sp.gov.br:8443/geonetwork/srv/api/records/780b35d2-2ed5-40ef-a708-6a6d4a4dee71/attachments/as.jpg
+</gco:CharacterString>
+</gmd:fileName>
+</gmd:MD_BrowseGraphic>
+</gmd:graphicOverview>
+<gmd:descriptiveKeywords>
+<gmd:MD_Keywords>
+<gmd:keyword>
+<gco:CharacterString>Municipio</gco:CharacterString>
+</gmd:keyword>
+<gmd:keyword>
+<gco:CharacterString>Imagens</gco:CharacterString>
+</gmd:keyword>
+<gmd:keyword>
+<gco:CharacterString>Bairro</gco:CharacterString>
+</gmd:keyword>
+<gmd:keyword>
+<gco:CharacterString>Assistência</gco:CharacterString>
+</gmd:keyword>
+<gmd:keyword>
+<gco:CharacterString>Social</gco:CharacterString>
+</gmd:keyword>
+<gmd:type>
+<gmd:MD_KeywordTypeCode codeListValue="theme" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode"/>
+</gmd:type>
+</gmd:MD_Keywords>
+</gmd:descriptiveKeywords>
+<gmd:descriptiveKeywords>
+<gmd:MD_Keywords>
+<gmd:keyword gco:nilReason="missing">
+<gco:CharacterString/>
+</gmd:keyword>
+<gmd:type>
+<gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="place"/>
+</gmd:type>
+</gmd:MD_Keywords>
+</gmd:descriptiveKeywords>
+<gmd:resourceConstraints>
+<gmd:MD_LegalConstraints>
+<gmd:accessConstraints>
+<gmd:MD_RestrictionCode codeListValue="intellectualPropertyRights" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode"/>
+</gmd:accessConstraints>
+<gmd:useConstraints>
+<gmd:MD_RestrictionCode codeListValue="intellectualPropertyRights" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode"/>
+</gmd:useConstraints>
+<gmd:otherConstraints gco:nilReason="missing">
+<gco:CharacterString/>
+</gmd:otherConstraints>
+</gmd:MD_LegalConstraints>
+</gmd:resourceConstraints>
+<gmd:spatialRepresentationType>
+<gmd:MD_SpatialRepresentationTypeCode codeListValue="vector" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_SpatialRepresentationTypeCode"/>
+</gmd:spatialRepresentationType>
+<gmd:spatialResolution>
+<gmd:MD_Resolution>
+<gmd:equivalentScale>
+<gmd:MD_RepresentativeFraction>
+<gmd:denominator>
+<gco:Integer>1000</gco:Integer>
+</gmd:denominator>
+</gmd:MD_RepresentativeFraction>
+</gmd:equivalentScale>
+</gmd:MD_Resolution>
+</gmd:spatialResolution>
+<gmd:language>
+<gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="por"/>
+</gmd:language>
+<gmd:characterSet>
+<gmd:MD_CharacterSetCode codeListValue="utf8" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode"/>
+</gmd:characterSet>
+<gmd:topicCategory>
+<gmd:MD_TopicCategoryCode>location</gmd:MD_TopicCategoryCode>
+</gmd:topicCategory>
+<gmd:topicCategory>
+<gmd:MD_TopicCategoryCode>imageryBaseMapsEarthCover</gmd:MD_TopicCategoryCode>
+</gmd:topicCategory>
+<gmd:topicCategory>
+<gmd:MD_TopicCategoryCode>planningCadastre</gmd:MD_TopicCategoryCode>
+</gmd:topicCategory>
+<gmd:topicCategory>
+<gmd:MD_TopicCategoryCode>utilitiesCommunication</gmd:MD_TopicCategoryCode>
+</gmd:topicCategory>
+<gmd:extent>
+<gmd:EX_Extent>
+<gmd:geographicElement>
+<gmd:EX_GeographicBoundingBox>
+<gmd:westBoundLongitude>
+<gco:Decimal>-46.7025</gco:Decimal>
+</gmd:westBoundLongitude>
+<gmd:eastBoundLongitude>
+<gco:Decimal>-46.2102</gco:Decimal>
+</gmd:eastBoundLongitude>
+<gmd:southBoundLatitude>
+<gco:Decimal>-23.5931</gco:Decimal>
+</gmd:southBoundLatitude>
+<gmd:northBoundLatitude>
+<gco:Decimal>-23.288</gco:Decimal>
+</gmd:northBoundLatitude>
+</gmd:EX_GeographicBoundingBox>
+</gmd:geographicElement>
+</gmd:EX_Extent>
+</gmd:extent>
+<gmd:supplementalInformation gco:nilReason="missing">
+<gco:CharacterString/>
+</gmd:supplementalInformation>
+</gmd:MD_DataIdentification>
+</gmd:identificationInfo>
+<gmd:distributionInfo>
+<gmd:MD_Distribution>
+<gmd:distributor>
+<gmd:MD_Distributor>
+<gmd:distributorContact>
+<gmd:CI_ResponsibleParty>
+<gmd:individualName gco:nilReason="missing">
+<gco:CharacterString/>
+</gmd:individualName>
+<gmd:organisationName gco:nilReason="missing">
+<gco:CharacterString/>
+</gmd:organisationName>
+<gmd:positionName>
+<gco:CharacterString>Departamento</gco:CharacterString>
+</gmd:positionName>
+<gmd:contactInfo>
+<gmd:CI_Contact>
+<gmd:phone>
+<gmd:CI_Telephone>
+<gmd:voice gco:nilReason="missing">
+<gco:CharacterString/>
+</gmd:voice>
+<gmd:facsimile gco:nilReason="missing">
+<gco:CharacterString/>
+</gmd:facsimile>
+</gmd:CI_Telephone>
+</gmd:phone>
+<gmd:address>
+<gmd:CI_Address>
+<gmd:deliveryPoint>
+<gco:CharacterString>Avenida Bom Clima, 49</gco:CharacterString>
+</gmd:deliveryPoint>
+<gmd:city>
+<gco:CharacterString>Macedo - Guarulhos</gco:CharacterString>
+</gmd:city>
+<gmd:administrativeArea>
+<gco:CharacterString>Divisão de Geoprocessamento</gco:CharacterString>
+</gmd:administrativeArea>
+<gmd:postalCode>
+<gco:CharacterString>07196-220</gco:CharacterString>
+</gmd:postalCode>
+<gmd:country>
+<gco:CharacterString>Brasil</gco:CharacterString>
+</gmd:country>
+<gmd:electronicMailAddress gco:nilReason="missing">
+<gco:CharacterString/>
+</gmd:electronicMailAddress>
+</gmd:CI_Address>
+</gmd:address>
+</gmd:CI_Contact>
+</gmd:contactInfo>
+<gmd:role>
+<gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode" codeListValue="publisher"/>
+</gmd:role>
+</gmd:CI_ResponsibleParty>
+</gmd:distributorContact>
+<gmd:distributionOrderProcess>
+<gmd:MD_StandardOrderProcess/>
+</gmd:distributionOrderProcess>
+<gmd:distributorFormat>
+<gmd:MD_Format>
+<gmd:name>
+<gco:CharacterString>Postgis - OGC / Shapefile</gco:CharacterString>
+</gmd:name>
+<gmd:version gco:nilReason="missing">
+<gco:CharacterString/>
+</gmd:version>
+</gmd:MD_Format>
+</gmd:distributorFormat>
+<gmd:distributorTransferOptions>
+<gmd:MD_DigitalTransferOptions/>
+</gmd:distributorTransferOptions>
+</gmd:MD_Distributor>
+</gmd:distributor>
+<gmd:distributor/>
+<gmd:distributor/>
+<gmd:transferOptions>
+<gmd:MD_DigitalTransferOptions>
+<gmd:onLine>
+<gmd:CI_OnlineResource>
+<gmd:linkage>
+<gmd:URL>https://guarugeo.guarulhos.sp.gov.br</gmd:URL>
+</gmd:linkage>
+<gmd:protocol>
+<gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>
+</gmd:protocol>
+<gmd:name>
+<gco:CharacterString>GUARUGeo</gco:CharacterString>
+</gmd:name>
+<gmd:description>
+<gco:CharacterString>
+Sistema de Consulta do Mapa Digital da Cidade de Guarulhos
+</gco:CharacterString>
+</gmd:description>
+</gmd:CI_OnlineResource>
+</gmd:onLine>
+<gmd:onLine>
+<gmd:CI_OnlineResource>
+<gmd:linkage>
+<gmd:URL>
+https://geoserver.guarulhos.sp.gov.br:8443/geoserver/public/wms?service=WMS&version=1.1.0&request=GetMap&layers=public%3Avw_sdas_assistencia_social&bbox=341116.6417%2C7402930.2138%2C356618.7088%2C7411819.775&width=768&height=440&srs=EPSG%3A31983&styles=&format=application/openlayers
+</gmd:URL>
+</gmd:linkage>
+<gmd:protocol>
+<gco:CharacterString>OGC:WMS-1.1.1-http-get-map</gco:CharacterString>
+</gmd:protocol>
+<gmd:name>
+<gco:CharacterString>Assistência Social</gco:CharacterString>
+</gmd:name>
+<gmd:description>
+<gco:CharacterString>Assistência Social do Município de Guarulhos</gco:CharacterString>
+</gmd:description>
+</gmd:CI_OnlineResource>
+</gmd:onLine>
+<gmd:onLine>
+<gmd:CI_OnlineResource>
+<gmd:linkage>
+<gmd:URL>
+https://www.guarulhos.sp.gov.br/categories/desenvolvimento-e-assistencia-social
+</gmd:URL>
+</gmd:linkage>
+<gmd:protocol>
+<gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>
+</gmd:protocol>
+<gmd:name>
+<gco:CharacterString>Secretaria de Desenvolvimento e Assistência Social</gco:CharacterString>
+</gmd:name>
+<gmd:description>
+<gco:CharacterString>
+A Secretaria de Desenvolvimento e Assistência Social é responsável por oferecer informações legais às instituições parceiras, orientar tecnicamente, monitorar e avaliar a rede, propor, estimular a troca de experiências, possibilitando que cada ator social envolvido na política pública cumpra o seu papel.
+</gco:CharacterString>
+</gmd:description>
+</gmd:CI_OnlineResource>
+</gmd:onLine>
+<gmd:onLine>
+<gmd:CI_OnlineResource>
+<gmd:linkage>
+<gmd:URL>
+https://guarugeo.guarulhos.sp.gov.br/download/shp/vw_sdas_assistencia_social.zip
+</gmd:URL>
+</gmd:linkage>
+<gmd:protocol>
+<gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>
+</gmd:protocol>
+<gmd:name>
+<gco:CharacterString>Assistência Social</gco:CharacterString>
+</gmd:name>
+<gmd:description>
+<gco:CharacterString>Shapes Assistência Social da cidade de Guarulhos</gco:CharacterString>
+</gmd:description>
+</gmd:CI_OnlineResource>
+</gmd:onLine>
+</gmd:MD_DigitalTransferOptions>
+</gmd:transferOptions>
+</gmd:MD_Distribution>
+</gmd:distributionInfo>
+<gmd:dataQualityInfo>
+<gmd:DQ_DataQuality>
+<gmd:scope>
+<gmd:DQ_Scope>
+<gmd:level>
+<gmd:MD_ScopeCode codeListValue="dataset" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode"/>
+</gmd:level>
+</gmd:DQ_Scope>
+</gmd:scope>
+<gmd:lineage>
+<gmd:LI_Lineage>
+<gmd:statement gco:nilReason="missing">
+<gco:CharacterString/>
+</gmd:statement>
+</gmd:LI_Lineage>
+</gmd:lineage>
+</gmd:DQ_DataQuality>
+</gmd:dataQualityInfo>
+</gmd:MD_Metadata>

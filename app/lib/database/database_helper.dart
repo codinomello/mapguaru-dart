@@ -18,9 +18,8 @@ class DatabaseHelper {
 
   /// Inicializa o banco de dados
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'mapguaru_app.db');
+    String path = join(await getDatabasesPath(), 'mapguaru.db');
 
-    await deleteDatabase(path); // ⚠️ REMOVE THIS LINE AFTER THE APP RUNS SUCCESSFULLY
     return await openDatabase(
       path,
       version: 1,
@@ -101,7 +100,7 @@ class DatabaseHelper {
     for (var category in categories) {
       await txn.insert('categories', category);
     }
-  }
+  }  
 
   // ============== MÉTODOS PARA USUÁRIOS ==============
 
@@ -162,7 +161,11 @@ class DatabaseHelper {
   /// Insere uma nova unidade de serviço
   Future<int> insertServiceUnit(Map<String, dynamic> unit) async {
     final db = await database;
-    return await db.insert('service_units', unit);
+    return await db.insert(
+      'service_units', 
+      unit,
+      conflictAlgorithm: ConflictAlgorithm.replace, // 🆕 Substitui se já existir
+    );
   }
   
   /// Busca todas as unidades de serviço
@@ -179,6 +182,31 @@ class DatabaseHelper {
       where: 'category_id = ?',
       whereArgs: [categoryId],
     );
+  }
+
+  /// 🆕 Limpa todas as unidades de serviço (para re-popular com dados da API)
+  Future<void> clearAllServiceUnits() async {
+    final db = await database;
+    await db.delete('service_units');
+  }
+
+  /// 🆕 Conta quantas unidades existem no banco
+  Future<int> countServiceUnits() async {
+    final db = await database;
+    final result = await db.rawQuery('SELECT COUNT(*) as count FROM service_units');
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
+
+  /// 🆕 Verifica se uma unidade já existe pelo nome e coordenadas
+  Future<bool> serviceUnitExists(String name, double lat, double lng) async {
+    final db = await database;
+    final result = await db.query(
+      'service_units',
+      where: 'name = ? AND latitude = ? AND longitude = ?',
+      whereArgs: [name, lat, lng],
+      limit: 1,
+    );
+    return result.isNotEmpty;
   }
 
   // ============== MÉTODOS PARA FAVORITOS ==============
@@ -208,7 +236,7 @@ class DatabaseHelper {
     final db = await database;
     // Junta as tabelas favorites e service_units para obter detalhes completos
     return await db.rawQuery('''
-      SELECT u.* FROM ser vice_units u
+      SELECT u.* FROM service_units u
       INNER JOIN favorites f ON u.unit_id = f.unit_id
       WHERE f.user_id = ?
     ''', [userId]);

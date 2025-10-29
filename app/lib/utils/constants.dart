@@ -1,7 +1,3 @@
-/// Constantes usadas em todo o aplicativo MapGuaru
-/// 
-/// Centraliza valores fixos, coordenadas padrão, 
-/// URLs e outras configurações estáticas
 class AppConstants {
   // ==================== INFORMAÇÕES DO APP ====================
   
@@ -93,6 +89,8 @@ class AppConstants {
   static const String keyUserEmail = 'user_email';
   static const String keyIsLoggedIn = 'is_logged_in';
   static const String keyFirstTime = 'first_time';
+  static const String keyThemeMode = 'theme_mode';
+  static const String keyLastDataUpdate = 'last_data_update';
   
   // ==================== ROTAS ====================
   
