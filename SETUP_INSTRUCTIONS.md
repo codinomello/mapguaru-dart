@@ -1,376 +1,425 @@
-# 📋 Instruções de Configuração - MapGuaru
+# 🚀 Intruções de Configuração - MapGuaru
 
-Este documento contém todas as instruções necessárias para configurar o projeto MapGuaru do zero.
+## ✅ Checklist de Implementação
 
----
+### 1. Atualizar Dependências
 
-## 📂 Estrutura Completa de Diretórios
-
-Crie a seguinte estrutura de pastas no seu projeto:
-
-```
-mapguaru/
-├── android/
-├── ios/
-├── lib/
-│   ├── database/
-│   │   └── database_helper.dart
-│   ├── models/
-│   │   └── models.dart
-│   ├── screens/
-│   │   ├── splash_screen.dart
-│   │   ├── menu_screen.dart
-│   │   ├── login_screen.dart
-│   │   ├── register_screen.dart
-│   │   ├── main_menu_screen.dart
-│   │   ├── category_detail_screen.dart
-│   │   ├── map_screen.dart
-│   │   ├── profile_screen.dart
-│   │   └── service_guide_screen.dart
-│   ├── utils/
-│   │   ├── constants.dart
-│   │   └── theme.dart
-│   └── main.dart
-├── assets/
-│   ├── images/
-│   ├── icons/
-│   └── fonts/
-│       ├── Helvetica.ttf
-│       └── Helvetica-Bold.ttf
-├── pubspec.yaml
-└── README.md
-```
-
----
-
-## 🔤 Fontes Helvetica
-
-### Opção 1: Usar fontes alternativas (Recomendado)
-
-Como Helvetica é uma fonte comercial, você pode usar alternativas gratuitas similares:
-
-**Substitua no `pubspec.yaml`:**
+**Arquivo: `pubspec.yaml`**
 
 ```yaml
-fonts:
-  - family: Helvetica
-    fonts:
-      - asset: assets/fonts/Roboto-Regular.ttf
-      - asset: assets/fonts/Roboto-Bold.ttf
-        weight: 700
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.16.0
+  
+  # Banco de dados
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  
+  # Mapas
+  flutter_map: ^6.0.0
+  latlong2: ^0.9.0
+  
+  # HTTP
+  http: ^1.1.2
+  
+  # Estado
+  provider: ^6.1.0
+  
+  # Armazenamento
+  shared_preferences: ^2.2.2
 ```
 
-E adicione as fontes Roboto (já inclusas no Flutter) ou baixe gratuitamente de:
-- [Google Fonts - Roboto](https://fonts.google.com/specimen/Roboto)
-- [Google Fonts - Inter](https://fonts.google.com/specimen/Inter)
-- [Google Fonts - Open Sans](https://fonts.google.com/specimen/Open+Sans)
-
-### Opção 2: Usar Helvetica Neue (se disponível)
-
-Se você tem acesso à fonte Helvetica:
-
-1. Crie a pasta `assets/fonts/`
-2. Adicione os arquivos:
-   - `Helvetica.ttf`
-   - `Helvetica-Bold.ttf`
-3. Configure conforme o `pubspec.yaml` fornecido
-
-### Opção 3: Remover fonte customizada
-
-Remova a seção `fonts` do `pubspec.yaml` e a propriedade `fontFamily` de todos os TextStyle no código. O Flutter usará a fonte padrão do sistema.
-
----
-
-## 🖼️ Assets (Imagens e Ícones)
-
-### Criando a pasta de assets
-
-```bash
-mkdir -p assets/images
-mkdir -p assets/icons
-mkdir -p assets/fonts
-```
-
-### Imagens necessárias (opcional)
-
-O app não requer imagens obrigatórias, mas você pode adicionar:
-
-- **Logo**: `assets/images/logo.png` (120x120px)
-- **Splash**: `assets/images/splash_bg.png`
-
-Se não tiver as imagens, o app usará ícones do Material Design.
-
----
-
-## ⚙️ Configuração Passo a Passo
-
-### 1. Criar Projeto Flutter
-
-```bash
-flutter create mapguaru
-cd mapguaru
-```
-
-### 2. Substituir pubspec.yaml
-
-Copie todo o conteúdo do arquivo `pubspec.yaml` fornecido.
-
-### 3. Instalar Dependências
-
+**Execute**:
 ```bash
 flutter pub get
 ```
 
-### 4. Criar Estrutura de Pastas
+---
+
+### 2. Substituir Arquivos Atualizados
+
+Copie os seguintes arquivos dos artifacts:
+
+#### ✅ Serviços
+- `lib/services/auth_service.dart` ← **auth_service_improved**
+- `lib/services/geonetwork_service.dart` ← **geonetwork_service**
+
+#### ✅ Telas
+- `lib/screens/login_screen.dart` ← **login_screen_improved**
+- `lib/screens/forgot_password_screen.dart` ← **forgot_password_screen**
+
+#### ✅ Database
+- `lib/database/database_helper.dart` ← **database_helper_fixed**
+
+#### ✅ Main
+- `lib/main.dart` ← **main_updated**
+
+---
+
+### 3. Configurar Firebase
+
+#### 3.1. Criar Projeto no Firebase Console
+
+1. Acesse https://console.firebase.google.com
+2. Crie novo projeto: **MapGuaru**
+3. Ative Google Analytics (opcional)
+
+#### 3.2. Adicionar App Android
 
 ```bash
-# No diretório lib/
-mkdir database models screens utils
-
-# No diretório raiz
-mkdir -p assets/fonts assets/images assets/icons
+# Nome do pacote
+com.mapguaru.app
 ```
 
-### 5. Copiar Arquivos Dart
+Baixe `google-services.json` → `android/app/`
 
-Copie todos os arquivos `.dart` fornecidos para suas respectivas pastas:
+#### 3.3. Adicionar App iOS (opcional)
 
-- `main.dart` → `lib/`
-- `database_helper.dart` → `lib/database/`
-- `models.dart` → `lib/models/`
-- `theme.dart` → `lib/utils/`
-- `constants.dart` → `lib/utils/`
-- Todas as screens → `lib/screens/`
-
-### 6. Configurar Permissões
-
-#### Android (`android/app/src/main/AndroidManifest.xml`)
-
-Adicione antes do `</manifest>`:
-
-```xml
-<uses-permission android:name="android.permission.INTERNET"/>
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+```bash
+# Bundle ID
+com.mapguaru.app
 ```
 
-#### iOS (`ios/Runner/Info.plist`)
+Baixe `GoogleService-Info.plist` → `ios/Runner/`
 
-Adicione antes do `</dict>`:
+#### 3.4. Configurar Firebase CLI
+
+```bash
+# Instalar FlutterFire CLI
+dart pub global activate flutterfire_cli
+
+# Configurar projeto
+flutterfire configure
+```
+
+#### 3.5. Ativar Autenticação
+
+No Firebase Console:
+1. **Authentication** > **Sign-in method**
+2. Ative:
+   - ✅ Email/Password
+   - ✅ Google
+   - ✅ Facebook (configure OAuth)
+   - ✅ GitHub (configure OAuth)
+
+---
+
+### 4. Configurar OAuth (Opcional)
+
+#### 4.1. Google
+Já configurado automaticamente pelo Firebase
+
+#### 4.2. Facebook
+
+1. Crie app em https://developers.facebook.com
+2. Copie **App ID** e **App Secret**
+3. Cole no Firebase Console > Authentication > Facebook
+4. Configure OAuth redirect:
+   ```
+   https://mapguaru-xxxxx.firebaseapp.com/__/auth/handler
+   ```
+
+#### 4.3. GitHub
+
+1. Acesse https://github.com/settings/developers
+2. Crie **New OAuth App**
+3. Authorization callback URL:
+   ```
+   https://mapguaru-xxxxx.firebaseapp.com/__/auth/handler
+   ```
+4. Copie **Client ID** e **Client Secret**
+5. Cole no Firebase Console > Authentication > GitHub
+
+---
+
+### 5. Configurar Permissões
+
+#### Android: `android/app/src/main/AndroidManifest.xml`
 
 ```xml
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>Este app precisa da sua localização para mostrar serviços próximos</string>
-<key>NSLocationAlwaysUsageDescription</key>
-<string>Este app precisa da sua localização para mostrar serviços próximos</string>
+<manifest>
+    <!-- Internet -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    
+    <!-- Biometria -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+    <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+    
+    <!-- Localização (opcional) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+</manifest>
+```
+
+#### iOS: `ios/Runner/Info.plist`
+
+```xml
+<dict>
+    <!-- Biometria -->
+    <key>NSFaceIDUsageDescription</key>
+    <string>Usamos Face ID para login rápido e seguro</string>
+    
+    <!-- Localização (opcional) -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Precisamos da sua localização para mostrar serviços próximos</string>
+</dict>
 ```
 
 ---
 
-## 🔧 Problemas Comuns e Soluções
+### 6. Testar Funcionalidades
 
-### Erro: "Font not found"
+#### 6.1. Teste de Compilação
 
-**Solução**: Remova a seção `fonts` do `pubspec.yaml` ou use fontes alternativas gratuitas.
-
-### Erro: "Package not found"
-
-**Solução**: Execute `flutter pub get` novamente.
-
-### Erro no mapa: "Tile not loading"
-
-**Solução**: Verifique conexão com internet e permissões de rede.
-
-### Erro de build Android
-
-**Solução**: 
 ```bash
-cd android
-./gradlew clean
-cd ..
 flutter clean
 flutter pub get
 flutter run
 ```
 
-### Erro de build iOS
+#### 6.2. Teste de Login Email/Senha
 
-**Solução**:
+1. Abra o app
+2. Clique em **Realizar cadastro**
+3. Preencha os dados
+4. Clique em **Criar conta**
+5. Verifique se foi para tela principal
+
+#### 6.3. Teste de Login Social
+
+**Google**:
+1. Clique no botão do Google
+2. Selecione uma conta
+3. Autorize o acesso
+4. Verifique login bem-sucedido
+
+**Facebook/GitHub**: Similar ao Google
+
+#### 6.4. Teste de Biometria
+
+**Android**:
+1. Emulador > Extended Controls (...)
+2. Fingerprint > Touch sensor
+3. No app, clique no botão de biometria
+4. "Toque" no sensor virtual
+
+**iOS**:
+1. Simulator > Features > Face ID
+2. Enrolled
+3. No app, clique no botão de biometria
+4. Simulator > Features > Matching Face
+
+#### 6.5. Teste de Recuperação de Senha
+
+1. Tela de login > **Esqueci a senha**
+2. Digite um email válido
+3. Clique em **Enviar Link**
+4. Verifique email (pode ir para spam)
+5. Clique no link recebido
+6. Defina nova senha
+
+#### 6.6. Teste de API do GeoNetwork
+
+```dart
+// Adicione na tela principal temporariamente
+ElevatedButton(
+  onPressed: () async {
+    final layers = await GeoNetworkService.getWMSLayers();
+    print('Camadas encontradas: ${layers.length}');
+    
+    for (var layer in layers) {
+      print('- ${layer['title']}');
+    }
+  },
+  child: Text('Testar API'),
+)
+```
+
+---
+
+### 7. Debug de Problemas Comuns
+
+#### Problema: Erro ao compilar
+
 ```bash
-cd ios
-pod install
-cd ..
 flutter clean
+rm -rf pubspec.lock
 flutter pub get
 flutter run
 ```
 
----
-
-## 🧪 Testando o Aplicativo
-
-### Teste em Emulador Android
+#### Problema: Firebase não inicializa
 
 ```bash
-# Listar emuladores
-flutter emulators
-
-# Iniciar emulador
-flutter emulators --launch <nome_emulador>
-
-# Executar app
+flutterfire configure --force
+flutter clean
 flutter run
 ```
 
-### Teste em Dispositivo Físico
+#### Problema: Biometria não funciona
 
-1. Ative **Modo Desenvolvedor** no dispositivo
-2. Ative **Depuração USB**
-3. Conecte via USB
-4. Execute: `flutter run`
+**Android**:
+- Verifique permissões no `AndroidManifest.xml`
+- Configure impressão digital no emulador
 
-### Teste em Emulador iOS (macOS apenas)
+**iOS**:
+- Verifique `NSFaceIDUsageDescription` no `Info.plist`
+- Ative Face ID no simulador
 
-```bash
-open -a Simulator
-flutter run
-```
+#### Problema: API do GeoNetwork retorna vazia
+
+- Verifique conexão com internet
+- Teste URL manualmente:
+  ```bash
+  curl "https://geonetwork.guarulhos.sp.gov.br:8443/geonetwork/srv/api/search/records/_search"
+  ```
+- Verifique logs no console com `flutter run -v`
 
 ---
 
-## 📱 Gerando APK para Distribuição
+### 8. Build para Produção
 
-### Debug APK (para testes)
+#### Android APK
 
 ```bash
+# Debug APK (para testes)
 flutter build apk --debug
-```
 
-O APK estará em: `build/app/outputs/flutter-apk/app-debug.apk`
-
-### Release APK (para produção)
-
-```bash
+# Release APK (para distribuição)
 flutter build apk --release
 ```
 
-O APK estará em: `build/app/outputs/flutter-apk/app-release.apk`
+**Arquivo gerado**: `build/app/outputs/flutter-apk/app-release.apk`
 
-### App Bundle (Google Play Store)
+#### Android App Bundle (Google Play)
 
 ```bash
 flutter build appbundle --release
 ```
 
+**Arquivo gerado**: `build/app/outputs/bundle/release/app-release.aab`
+
+#### iOS
+
+```bash
+flutter build ios --release
+```
+
+Depois abra `ios/Runner.xcworkspace` no Xcode para archive e upload.
+
 ---
 
-## 🎨 Personalizando o App
+### 9. Variáveis de Ambiente (Opcional)
 
-### Alterando Nome do App
+Para proteger chaves de API, crie `.env`:
 
-**Android** (`android/app/src/main/AndroidManifest.xml`):
-```xml
-<application android:label="MapGuaru" ...>
+```env
+FIREBASE_API_KEY=sua_chave_aqui
+GEONETWORK_URL=https://geonetwork.guarulhos.sp.gov.br:8443
 ```
 
-**iOS** (`ios/Runner/Info.plist`):
-```xml
-<key>CFBundleName</key>
-<string>MapGuaru</string>
+Adicione ao `.gitignore`:
 ```
-
-### Alterando Ícone do App
-
-Use o pacote `flutter_launcher_icons`:
-
-1. Adicione ao `pubspec.yaml`:
-```yaml
-dev_dependencies:
-  flutter_launcher_icons: ^0.13.1
-
-flutter_launcher_icons:
-  android: true
-  ios: true
-  image_path: "assets/icons/app_icon.png"
-```
-
-2. Execute:
-```bash
-flutter pub get
-flutter pub run flutter_launcher_icons
-```
-
-### Alterando Cores do Tema
-
-Edite `lib/utils/theme.dart` e altere as cores conforme desejado:
-
-```dart
-static const Color primaryColor = Color(0xFF2563EB); // Sua cor aqui
+.env
+*.env
+google-services.json
+GoogleService-Info.plist
 ```
 
 ---
 
-## 🗄️ Populando Banco de Dados
+### 10. Checklist Final
 
-O banco será populado automaticamente na primeira execução com dados de exemplo.
+Antes de fazer deploy, verifique:
 
-Para adicionar mais dados:
+- ✅ Todos os testes passando
+- ✅ Firebase configurado corretamente
+- ✅ Permissões configuradas (Android + iOS)
+- ✅ OAuth configurado (se usando login social)
+- ✅ API do GeoNetwork funcionando
+- ✅ Ícone do app personalizado
+- ✅ Splash screen configurado
+- ✅ Nome do app correto
+- ✅ Versão atualizada em `pubspec.yaml`
+- ✅ Build de release testado
+- ✅ Sem dados sensíveis no código
 
-1. Abra `lib/utils/constants.dart`
-2. Adicione entradas no array `sampleServiceUnits`
-3. Limpe os dados do app ou desinstale e reinstale
+---
 
-Para resetar o banco em desenvolvimento:
+## 📱 Estrutura Final do Projeto
 
-```dart
-// Adicione temporariamente no main.dart
-await DatabaseHelper().deleteDatabase();
+```
+mapguaru/
+├── android/
+│   └── app/
+│       ├── google-services.json     ✅
+│       └── src/main/AndroidManifest.xml ✅
+├── ios/
+│   └── Runner/
+│       ├── GoogleService-Info.plist ✅
+│       └── Info.plist               ✅
+├── lib/
+│   ├── database/
+│   │   └── database_helper.dart     ✅ Atualizado
+│   ├── models/
+│   │   ├── favorite_model.dart
+│   │   ├── news_model.dart
+│   │   ├── required_document_model.dart
+│   │   ├── service_category_model.dart
+│   │   ├── service_unit_model.dart
+│   │   ├── user_model.dart
+│   ├── screens/
+│   │   ├── category_detail_screen.dart
+│   │   ├── forgot_password_screen.dart ✅ Atualizado
+│   │   ├── login_screen.dart          ✅ Atualizado
+│   │   ├── main_menu_screen.dart
+│   │   ├── map_screen.dart
+│   │   ├── menu_screen.dart
+│   │   ├── profile_screen.dart
+│   │   ├── register_screen.dart
+│   │   ├── service_guide_screen.dart
+│   │   └── splash_screen.dart
+│   ├── services/
+│   │   ├── auth_service.dart          ✅ Atualizado
+│   │   ├── geonetwork_service.dart    ✅ Atualizado
+│   │   └── theme_service.dart
+│   ├── utils/
+│   │   ├── constants.dart
+│   │   └── theme.dart
+│   ├── firebase_options.dart          ✅ Gerado
+│   └── main.dart                      ✅ Atualizado
+├── pubspec.yaml                       ✅ Atualizado
+└── README.md
 ```
 
 ---
 
-## 🔍 Debugging e Logs
+## 🎓 Recursos Adicionais
 
-### Habilitar logs detalhados
-
-```bash
-flutter run --verbose
-```
-
-### Ver logs do dispositivo
-
-**Android**:
-```bash
-adb logcat
-```
-
-**iOS**:
-```bash
-xcrun simctl spawn booted log stream --predicate 'processImagePath contains "Runner"'
-```
-
-### Inspecionar banco de dados
-
-Use ferramentas como:
-- **Android**: DB Browser for SQLite
-- **iOS**: Core Data Lab
-
-Localização do banco:
-- Android: `/data/data/com.mapguaru.app/databases/mapguaru.db`
-- iOS: `Library/Application Support/mapguaru.db`
+- [Documentação Flutter](https://docs.flutter.dev/)
+- [Firebase Flutter](https://firebase.flutter.dev/)
+- [GeoNetwork API](https://geonetwork-opensource.org/manuals/trunk/en/api/index.html)
+- [Flutter Map](https://docs.fleaflet.dev/)
+- [Local Auth](https://pub.dev/packages/local_auth)
 
 ---
 
-## 📚 Recursos Úteis
+## 🆘 Suporte
 
-### Documentação Oficial
+**Problemas?**
+1. Verifique os logs: `flutter run -v`
+2. Consulte o arquivo `CORREÇÕES.md`
+3. Abra uma issue no GitHub
 
-- [Flutter Docs](https://docs.flutter.dev/)
-- [Dart Docs](https://dart.dev/guides)
-- [flutter_map Docs](https://docs.fleaflet.dev/)
+**Tudo funcionando?** 
+🎉 Parabéns! Seu app MapGuaru está pronto!
 
-### Tutoriais Recomendados
+---
 
-- [Flutter Cookbook](https://docs.flutter.dev/cookbook)
-- [SQLite em Flutter](https://docs.flutter.dev/cookbook/persistence/sqlite)
-- [Provider State Management](https://
+**Última atualização**: Outubro 2025
+**Versão**: 1.0.0

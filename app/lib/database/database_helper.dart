@@ -2,14 +2,21 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 
+/// Helper para gerenciamento do banco de dados SQLite local
+/// 
+/// Implementa padrão Singleton para garantir única instância do banco
+/// e fornece métodos CRUD para todas as entidades do sistema
 class DatabaseHelper {
-  // Padrão Singleton para garantir uma única instância do banco
+  // Padrão Singleton
   static final DatabaseHelper _instance = DatabaseHelper._internal();
   factory DatabaseHelper() => _instance;
   DatabaseHelper._internal();
 
   static Database? _database;
 
+  /// Retorna instância do banco de dados
+  /// 
+  /// Cria o banco se ainda não existir
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDatabase();
@@ -17,6 +24,8 @@ class DatabaseHelper {
   }
 
   /// Inicializa o banco de dados
+  /// 
+  /// Cria arquivo SQLite e define configurações iniciais
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'mapguaru.db');
 
@@ -27,7 +36,9 @@ class DatabaseHelper {
     );
   }
 
-  /// Chamado na primeira vez que o banco é criado
+  /// Callback executado na primeira criação do banco
+  /// 
+  /// Cria todas as tabelas e popula dados iniciais
   Future<void> _onCreate(Database db, int version) async {
     await db.transaction((txn) async {
       // Tabela de Usuários
@@ -71,7 +82,7 @@ class DatabaseHelper {
         )
       ''');
 
-      // Tabela de Favoritos (Tabela de Junção)
+      // Tabela de Favoritos (relacionamento N:N)
       await txn.execute('''
         CREATE TABLE favorites (
           user_id INTEGER NOT NULL,
@@ -82,12 +93,12 @@ class DatabaseHelper {
         )
       ''');
 
-      // Popular a tabela de categorias com dados iniciais
+      // Popula categorias iniciais
       await _populateCategories(txn);
     });
   }
 
-  /// Popula a tabela de categorias
+  /// Popula tabela de categorias com dados fixos
   Future<void> _populateCategories(Transaction txn) async {
     final categories = [
       {'category_id': 1, 'name': 'Saúde', 'icon': 'health'},
@@ -97,33 +108,48 @@ class DatabaseHelper {
       {'category_id': 5, 'name': 'Transporte', 'icon': 'transport'},
       {'category_id': 6, 'name': 'Cultura & Lazer', 'icon': 'culture'},
     ];
+    
     for (var category in categories) {
       await txn.insert('categories', category);
     }
-  }  
+  }
 
-  // ============== MÉTODOS PARA USUÁRIOS ==============
+  // ==================== MÉTODOS PARA USUÁRIOS ====================
 
-  /// Registra um novo usuário
+  /// Registra novo usuário no banco local
+  /// 
+  /// [name] - Nome completo do usuário
+  /// [email] - Email único do usuário
+  /// [password] - Senha em texto simples (ATENÇÃO: usar hash em produção)
+  /// 
+  /// Retorna ID do usuário criado ou null se email já existe
   Future<int?> registerUser(String name, String email, String password) async {
     final db = await database;
-    // Verifica se o email já existe
+    
+    // Verifica se email já está cadastrado
     final existingUser = await db.query(
       'users',
       where: 'email = ?',
       whereArgs: [email],
     );
+    
     if (existingUser.isNotEmpty) {
-      return null; // Retorna nulo se o email já estiver em uso
+      return null;
     }
+    
     return await db.insert('users', {
       'name': name,
       'email': email,
-      'password': password, // ATENÇÃO: Em um app real, use criptografia (ex: bcrypt)
+      'password': password,
     });
   }
 
-  /// Autentica um usuário
+  /// Autentica usuário com email e senha
+  /// 
+  /// [email] - Email do usuário
+  /// [password] - Senha do usuário
+  /// 
+  /// Retorna dados do usuário se credenciais válidas, null caso contrário
   Future<Map<String, dynamic>?> loginUser(String email, String password) async {
     final db = await database;
     final List<Map<String, dynamic>> users = await db.query(
@@ -131,13 +157,20 @@ class DatabaseHelper {
       where: 'email = ? AND password = ?',
       whereArgs: [email, password],
     );
+    
     if (users.isNotEmpty) {
       return users.first;
     }
+    
     return null;
   }
 
-  /// Atualiza dados do usuário
+  /// Atualiza dados de um usuário
+  /// 
+  /// [userId] - ID do usuário a ser atualizado
+  /// [data] - Map com campos a serem atualizados
+  /// 
+  /// Retorna número de linhas afetadas
   Future<int> updateUser(int userId, Map<String, dynamic> data) async {
     final db = await database;
     return await db.update(
@@ -148,33 +181,39 @@ class DatabaseHelper {
     );
   }
 
-  // ============== MÉTODOS PARA CATEGORIAS ==============
+  // ==================== MÉTODOS PARA CATEGORIAS ====================
 
-  /// Busca todas as categorias
+  /// Busca todas as categorias ordenadas por ID
   Future<List<Map<String, dynamic>>> getCategories() async {
     final db = await database;
     return await db.query('categories', orderBy: 'category_id');
   }
 
-  // ============== MÉTODOS PARA UNIDADES DE SERVIÇO ==============
+  // ==================== MÉTODOS PARA UNIDADES DE SERVIÇO ====================
 
-  /// Insere uma nova unidade de serviço
+  /// Insere nova unidade de serviço
+  /// 
+  /// [unit] - Map com dados da unidade
+  /// 
+  /// Usa ConflictAlgorithm.replace para atualizar se já existir
   Future<int> insertServiceUnit(Map<String, dynamic> unit) async {
     final db = await database;
     return await db.insert(
-      'service_units', 
+      'service_units',
       unit,
-      conflictAlgorithm: ConflictAlgorithm.replace, // 🆕 Substitui se já existir
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
-  
-  /// Busca todas as unidades de serviço
+
+  /// Busca todas as unidades de serviço cadastradas
   Future<List<Map<String, dynamic>>> getAllServiceUnits() async {
     final db = await database;
     return await db.query('service_units');
   }
 
-  /// Busca unidades de serviço por categoria
+  /// Busca unidades de uma categoria específica
+  /// 
+  /// [categoryId] - ID da categoria desejada
   Future<List<Map<String, dynamic>>> getServiceUnitsByCategory(int categoryId) async {
     final db = await database;
     return await db.query(
@@ -184,20 +223,26 @@ class DatabaseHelper {
     );
   }
 
-  /// 🆕 Limpa todas as unidades de serviço (para re-popular com dados da API)
+  /// Limpa todas as unidades de serviço
+  /// 
+  /// Útil para re-popular dados da API
   Future<void> clearAllServiceUnits() async {
     final db = await database;
     await db.delete('service_units');
   }
 
-  /// 🆕 Conta quantas unidades existem no banco
+  /// Conta total de unidades cadastradas
   Future<int> countServiceUnits() async {
     final db = await database;
     final result = await db.rawQuery('SELECT COUNT(*) as count FROM service_units');
     return Sqflite.firstIntValue(result) ?? 0;
   }
 
-  /// 🆕 Verifica se uma unidade já existe pelo nome e coordenadas
+  /// Verifica se unidade já existe por nome e coordenadas
+  /// 
+  /// [name] - Nome da unidade
+  /// [lat] - Latitude
+  /// [lng] - Longitude
   Future<bool> serviceUnitExists(String name, double lat, double lng) async {
     final db = await database;
     final result = await db.query(
@@ -209,19 +254,27 @@ class DatabaseHelper {
     return result.isNotEmpty;
   }
 
-  // ============== MÉTODOS PARA FAVORITOS ==============
+  // ==================== MÉTODOS PARA FAVORITOS ====================
 
-  /// Adiciona um favorito
+  /// Adiciona unidade aos favoritos do usuário
+  /// 
+  /// [userId] - ID do usuário
+  /// [unitId] - ID da unidade
+  /// 
+  /// Ignora se já existir (evita duplicatas)
   Future<void> addFavorite(int userId, int unitId) async {
     final db = await database;
     await db.insert(
       'favorites',
       {'user_id': userId, 'unit_id': unitId},
-      conflictAlgorithm: ConflictAlgorithm.ignore, // Ignora se já existir
+      conflictAlgorithm: ConflictAlgorithm.ignore,
     );
   }
 
-  /// Remove um favorito
+  /// Remove unidade dos favoritos do usuário
+  /// 
+  /// [userId] - ID do usuário
+  /// [unitId] - ID da unidade
   Future<void> removeFavorite(int userId, int unitId) async {
     final db = await database;
     await db.delete(
@@ -231,10 +284,13 @@ class DatabaseHelper {
     );
   }
 
-  /// Busca todos os favoritos de um usuário
+  /// Busca todos os favoritos de um usuário com detalhes completos
+  /// 
+  /// [userId] - ID do usuário
+  /// 
+  /// Retorna lista de unidades favoritadas com JOIN
   Future<List<Map<String, dynamic>>> getUserFavorites(int userId) async {
     final db = await database;
-    // Junta as tabelas favorites e service_units para obter detalhes completos
     return await db.rawQuery('''
       SELECT u.* FROM service_units u
       INNER JOIN favorites f ON u.unit_id = f.unit_id

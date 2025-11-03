@@ -1,54 +1,79 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../utils/theme.dart'; // <<< ADICIONADO
+import 'package:provider/provider.dart';
+import '../services/auth_service.dart';
+import '../utils/constants.dart';
+import '../utils/theme.dart';
 
+/// Tela de recuperação de senha via email
 class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
+
   @override
-  _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  bool _isLoading = false; // <<< ADICIONADO
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  
+  bool _isLoading = false;
+  bool _emailSent = false;
 
-  Future<void> _sendPasswordResetEmail() async {
-    String email = _emailController.text.trim();
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
 
-    if (email.isEmpty) {
-      _showSnackBar(context, "Por favor, insira seu e-mail.", isError: true);
-      return;
+  /// Valida formato do email
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Digite seu email';
     }
+    final emailRegex = RegExp(AppConstants.emailRegex);
+    if (!emailRegex.hasMatch(value)) {
+      return AppConstants.errorEmailInvalid;
+    }
+    return null;
+  }
 
-    setState(() => _isLoading = true); // <<< ADICIONADO
+  /// Envia email de recuperação
+  Future<void> _sendResetEmail() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
 
     try {
-      await _auth.sendPasswordResetEmail(email: email);
-      
-      _showSnackBar(context, 
-        "Link de redefinição enviado para $email. Verifique sua caixa de entrada.", 
-        isError: false
+      final authService = Provider.of<AuthService>(context, listen: false);
+      final success = await authService.sendPasswordResetEmail(
+        _emailController.text.trim(),
       );
-      
-      if (mounted) Navigator.of(context).pop();
 
-    } on FirebaseAuthException catch (e) {
-      String message;
-      if (e.code == 'user-not-found') {
-        message = "Ocorreu um erro. Verifique se o e-mail está correto e tente novamente."; 
+      if (!mounted) return;
+
+      if (success) {
+        setState(() => _emailSent = true);
+        _showSnackBar(
+          'Link de redefinição enviado para ${_emailController.text.trim()}',
+          isError: false,
+        );
       } else {
-        message = e.message ?? "Erro desconhecido ao enviar o e-mail.";
+        _showSnackBar(
+          'Erro ao enviar email. Verifique se o email está correto',
+        );
       }
-      _showSnackBar(context, message, isError: true);
+    } catch (e) {
+      if (mounted) {
+        _showSnackBar('Erro ao enviar email de recuperação');
+      }
     } finally {
       if (mounted) {
-        setState(() => _isLoading = false); // <<< ADICIONADO
+        setState(() => _isLoading = false);
       }
     }
   }
 
-  // <<< ALTERADO: Padronizado com os outros SnackBar
-  void _showSnackBar(BuildContext context, String message, {bool isError = true}) {
+  void _showSnackBar(String message, {bool isError = true}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -61,42 +86,174 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Esqueci a Senha')),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: <Widget>[
-            const Text('Informe seu e-mail para redefinir a senha:'),
-            const SizedBox(height: 15),
-            // <<< ALTERADO: TextFormField padronizado com o tema
-            TextFormField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                labelText: 'E-mail',
-                hintText: 'Digite seu e-mail',
-                prefixIcon: Icon(Icons.email_outlined),
-              ),
-            ),
-            const SizedBox(height: 20),
-            // <<< ALTERADO: ElevatedButton padronizado com o tema
-            ElevatedButton(
-              onPressed: _isLoading ? null : _sendPasswordResetEmail,
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),
-              ),
-              child: _isLoading 
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+      appBar: AppBar(
+        title: const Text('Recuperar Senha'),
+        elevation: 0,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 20),
+
+                /// Ícone
+                Center(
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: _emailSent
+                          ? AppTheme.success.withOpacity(0.1)
+                          : AppTheme.primaryColor.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      _emailSent ? Icons.check_circle : Icons.lock_reset,
+                      size: 40,
+                      color: _emailSent ? AppTheme.success : AppTheme.primaryColor,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                /// Título
+                Text(
+                  _emailSent ? 'Email Enviado!' : 'Esqueceu a senha?',
+                  style: TextStyle(
+                    fontFamily: 'Helvetica',
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).textTheme.titleLarge?.color,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 8),
+
+                /// Descrição
+                Text(
+                  _emailSent
+                      ? 'Enviamos um link de recuperação para seu email. Verifique sua caixa de entrada e spam.'
+                      : 'Digite seu email cadastrado e enviaremos um link para redefinir sua senha.',
+                  style: TextStyle(
+                    fontFamily: 'Helvetica',
+                    fontSize: 14,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 32),
+
+                if (!_emailSent) ...[
+                  /// Campo de email
+                  TextFormField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      labelText: 'E-mail',
+                      hintText: 'Digite seu e-mail',
+                      prefixIcon: Icon(Icons.email_outlined),
+                    ),
+                    validator: _validateEmail,
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  /// Botão enviar
+                  SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _sendResetEmail,
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Text('Enviar Link de Recuperação'),
+                    ),
+                  ),
+                ] else ...[
+                  /// Botão voltar ao login
+                  SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Voltar ao Login'),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  /// Botão reenviar
+                  SizedBox(
+                    height: 50,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        setState(() => _emailSent = false);
+                      },
+                      child: const Text('Enviar Novamente'),
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 24),
+
+                /// Dicas
+                if (!_emailSent)
+                  Card(
+                    color: AppTheme.info.withOpacity(0.1),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.info_outline,
+                                color: AppTheme.info,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Dica',
+                                style: TextStyle(
+                                  fontFamily: 'Helvetica',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).textTheme.titleLarge?.color,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'O link de recuperação é válido por 1 hora. Se não receber o email, verifique sua pasta de spam ou lixo eletrônico.',
+                            style: TextStyle(
+                              fontFamily: 'Helvetica',
+                              fontSize: 12,
+                              color: Theme.of(context).textTheme.bodyMedium?.color,
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
                       ),
-                    )
-                  : const Text('Enviar Link de Redefinição'),
+                    ),
+                  ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

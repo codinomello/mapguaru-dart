@@ -14,6 +14,7 @@ import 'screens/splash_screen.dart';
 import 'screens/menu_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
+import 'screens/forgot_password_screen.dart';
 import 'screens/main_menu_screen.dart';
 import 'screens/category_detail_screen.dart';
 import 'screens/map_screen.dart';
@@ -24,24 +25,25 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 🔥 Inicializa o Firebase (com tratamento de erro)
+  // Inicializa Firebase
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    debugPrint('✅ Firebase inicializado');
   } catch (e) {
-    debugPrint('Erro ao inicializar Firebase: $e');
+    debugPrint('❌ Erro ao inicializar Firebase: $e');
   }
 
-  // 🔒 Bloqueia a orientação do app em retrato
+  // Bloqueia orientação em retrato
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  // 🧩 Inicializa banco local e dados da API
+  // Inicializa banco de dados e carrega dados
   final dbHelper = DatabaseHelper();
-  await _initializeDataFromAPI(dbHelper); // 🆕 NOVA FUNÇÃO
+  await _initializeDataFromAPI(dbHelper);
 
   runApp(
     MultiProvider(
@@ -56,38 +58,34 @@ Future<void> main() async {
   );
 }
 
-/// 🆕 NOVA FUNÇÃO: Carrega dados reais da API do GeoServer
+/// Inicializa dados da API do GeoServer
 Future<void> _initializeDataFromAPI(DatabaseHelper dbHelper) async {
   final prefs = await SharedPreferences.getInstance();
   final isFirstTime = prefs.getBool(AppConstants.keyFirstTime) ?? true;
   final lastUpdate = prefs.getString(AppConstants.keyLastDataUpdate);
   
-  // Define se precisa atualizar (primeira vez ou passaram mais de 7 dias)
   bool needsUpdate = isFirstTime;
   
   if (!isFirstTime && lastUpdate != null) {
     final lastUpdateDate = DateTime.parse(lastUpdate);
     final daysSinceUpdate = DateTime.now().difference(lastUpdateDate).inDays;
-    needsUpdate = daysSinceUpdate > 7; // Atualiza a cada 7 dias
+    needsUpdate = daysSinceUpdate > 7;
   }
 
   if (needsUpdate) {
-    debugPrint('🔄 Atualizando dados da API do GeoServer...');
+    debugPrint('🔄 Atualizando dados da API...');
     
     try {
-      // 1️⃣ Primeiro, tenta buscar camadas disponíveis
+      // Busca camadas disponíveis
       final availableLayers = await GeoNetworkService.getWMSLayers();
-      debugPrint('📋 Camadas disponíveis: ${availableLayers.join(", ")}');
+      debugPrint('📋 ${availableLayers.length} camadas WMS encontradas');
       
-      // 2️⃣ Busca todos os dados das camadas
+      // Busca unidades de serviço
       final units = await GeoNetworkService.fetchAllServiceUnits();
       
       if (units.isNotEmpty) {
-        // 3️⃣ Limpa dados antigos (opcional - pode causar perda de favoritos)
-        // await dbHelper.clearAllServiceUnits();
-        
-        // 4️⃣ Insere novos dados
         int insertedCount = 0;
+        
         for (var unit in units) {
           try {
             await dbHelper.insertServiceUnit(unit);
@@ -97,40 +95,36 @@ Future<void> _initializeDataFromAPI(DatabaseHelper dbHelper) async {
           }
         }
         
-        debugPrint('✅ $insertedCount unidades inseridas no banco local');
+        debugPrint('✅ $insertedCount unidades inseridas');
         
-        // 5️⃣ Atualiza data da última sincronização
         await prefs.setString(
-          AppConstants.keyLastDataUpdate, 
+          AppConstants.keyLastDataUpdate,
           DateTime.now().toIso8601String(),
         );
       } else {
-        debugPrint('⚠️ Nenhum dado foi retornado da API');
+        debugPrint('⚠️ Nenhum dado retornado da API');
         
-        // Se for primeira vez e não conseguiu dados, usa dados de exemplo
         if (isFirstTime) {
-          debugPrint('📦 Usando dados de exemplo como fallback...');
+          debugPrint('📦 Usando dados de exemplo...');
           await _insertSampleData(dbHelper);
         }
       }
-      
     } catch (e) {
       debugPrint('❌ Erro ao buscar dados da API: $e');
       
-      // Se for primeira vez e houve erro, usa dados de exemplo
       if (isFirstTime) {
-        debugPrint('📦 Usando dados de exemplo como fallback...');
+        debugPrint('📦 Usando dados de exemplo...');
         await _insertSampleData(dbHelper);
       }
     }
     
     await prefs.setBool(AppConstants.keyFirstTime, false);
   } else {
-    debugPrint('✓ Dados já estão atualizados');
+    debugPrint('✅ Dados já estão atualizados');
   }
 }
 
-/// Fallback: insere dados de exemplo se API falhar
+/// Insere dados de exemplo como fallback
 Future<void> _insertSampleData(DatabaseHelper dbHelper) async {
   for (var unit in AppConstants.sampleServiceUnits) {
     try {
@@ -151,12 +145,15 @@ class MapGuaruApp extends StatelessWidget {
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: context.watch<ThemeProvider>().themeMode,
       initialRoute: AppConstants.routeSplash,
       routes: {
         AppConstants.routeSplash: (context) => const SplashScreen(),
         AppConstants.routeMenu: (context) => const MenuScreen(),
         AppConstants.routeLogin: (context) => const LoginScreen(),
         AppConstants.routeRegister: (context) => const RegisterScreen(),
+        '/forgot-password': (context) => const ForgotPasswordScreen(),
         AppConstants.routeMainMenu: (context) => const MainMenuScreen(),
         AppConstants.routeMap: (context) => const MapScreen(),
         AppConstants.routeProfile: (context) => const ProfileScreen(),
@@ -178,6 +175,7 @@ class MapGuaruApp extends StatelessWidget {
   }
 }
 
+/// Provider de usuário
 class UserProvider with ChangeNotifier {
   int? _userId;
   String? _userName;
@@ -189,7 +187,7 @@ class UserProvider with ChangeNotifier {
   String? get userEmail => _userEmail;
   bool get isLoggedIn => _isLoggedIn;
 
-  /// 🔹 Carrega dados locais do usuário
+  /// Carrega dados do usuário salvos
   Future<void> loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     _userId = prefs.getInt(AppConstants.keyUserId);
@@ -199,7 +197,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// 🔹 Login persistente
+  /// Faz login
   Future<void> login(int userId, String name, String email) async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -216,7 +214,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// 🔹 Logout completo
+  /// Faz logout
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -230,13 +228,12 @@ class UserProvider with ChangeNotifier {
     await prefs.remove(AppConstants.keyUserEmail);
     await prefs.setBool(AppConstants.keyIsLoggedIn, false);
 
-    // Sai também do Firebase
     await FirebaseAuth.instance.signOut();
 
     notifyListeners();
   }
 
-  /// 🔹 Atualiza nome local
+  /// Atualiza nome
   Future<void> updateName(String newName) async {
     final prefs = await SharedPreferences.getInstance();
     _userName = newName;
@@ -245,6 +242,7 @@ class UserProvider with ChangeNotifier {
   }
 }
 
+/// Provider de favoritos
 class FavoritesProvider with ChangeNotifier {
   final List<int> _favoriteIds = [];
 
