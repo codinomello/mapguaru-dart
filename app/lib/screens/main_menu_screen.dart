@@ -46,6 +46,54 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
         title: const Text(AppConstants.appName),
         automaticallyImplyLeading: false,
         actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              switch (value) {
+                case 'emergency':
+                  Navigator.of(context).pushNamed(AppConstants.routeEmergency);
+                  break;
+                case 'news':
+                  Navigator.of(context).pushNamed(AppConstants.routeNews);
+                  break;
+                case 'city-guide':
+                  Navigator.of(context).pushNamed(AppConstants.routeCityGuide);
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'emergency',
+                child: Row(
+                  children: [
+                    Icon(Icons.emergency, color: Color(0xFFDC2626)),
+                    SizedBox(width: 12),
+                    Text('Emergências'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'news',
+                child: Row(
+                  children: [
+                    Icon(Icons.newspaper, color: Color(0xFF2563EB)),
+                    SizedBox(width: 12),
+                    Text('Notícias'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'city-guide',
+                child: Row(
+                  children: [
+                    Icon(Icons.location_city, color: Color(0xFF059669)),
+                    SizedBox(width: 12),
+                    Text('Guia da Cidade'),
+                  ],
+                ),
+              ),
+            ],
+          ),
           // Botão de perfil/login
           IconButton(
             icon: Icon(
@@ -71,6 +119,9 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                   // Header com boas-vindas
                   _buildHeader(userProvider),
                   
+                  // Seção de serviços adicionais
+                  _buildAdditionalServices(),
+
                   // Grid de categorias
                   _buildCategoriesGrid(),
                   
@@ -132,6 +183,103 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Constrói seção de serviços adicionais
+  Widget _buildAdditionalServices() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Serviços Adicionais',
+            style: TextStyle(
+              fontFamily: 'Helvetica',
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).textTheme.titleLarge?.color,
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          Row(
+            children: [
+              Expanded(
+                child: _buildServiceCard(
+                  'Emergências',
+                  Icons.emergency,
+                  const Color(0xFFDC2626),
+                  () => Navigator.of(context).pushNamed(AppConstants.routeEmergency),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildServiceCard(
+                  'Notícias',
+                  Icons.newspaper,
+                  const Color(0xFF2563EB),
+                  () => Navigator.of(context).pushNamed(AppConstants.routeNews),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildServiceCard(
+                  'Guia da Cidade',
+                  Icons.location_city,
+                  const Color(0xFF059669),
+                  () => Navigator.of(context).pushNamed(AppConstants.routeCityGuide),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(), // Espaço vazio para manter layout
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServiceCard(String title, IconData icon, Color color, VoidCallback onTap) {
+    return Card(
+      elevation: 2,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 28),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontFamily: 'Helvetica',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

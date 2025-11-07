@@ -3,23 +3,20 @@ import 'package:provider/provider.dart';
 import '../utils/constants.dart';
 import '../utils/theme.dart';
 import '../main.dart';
-import '../screens/map_screen.dart'; // <<< ADICIONADO
+import '../screens/map_screen.dart';
 
 /// Tela de menu inicial
-class MenuScreen extends StatefulWidget { // <<< ALTERADO para StatefulWidget
+class MenuScreen extends StatefulWidget { 
   const MenuScreen({super.key});
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
 }
 
-class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateMixin { // <<< ADICIONADO
-  
-  // --- ESTADO DA ANIMAÇÃO DO MAPA (MOVIDO DE LOGIN_SCREEN) ---
+class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateMixin {
   bool _mapExpanded = false;
   late AnimationController _animationController;
   late Animation<double> _mapHeightAnimation;
-  // --- FIM DO ESTADO DA ANIMAÇÃO ---
   
   @override
   void initState() {
@@ -33,7 +30,7 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
       });
     }
 
-    // --- INICIALIZAÇÃO DA ANIMAÇÃO (MOVIDO DE LOGIN_SCREEN) ---
+    // --- INICIALIZAÇÃO DA ANIMAÇÃO ---
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -55,7 +52,7 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
     super.dispose();
   }
 
-  /// Expande o mapa e navega para MapScreen (MOVIDO DE LOGIN_SCREEN)
+  /// Expande o mapa e navega para MapScreen
   Future<void> _expandMapAndNavigate() async {
     setState(() {
       _mapExpanded = true;
@@ -78,10 +75,10 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // --- SEÇÃO DO MAPA INTERATIVO (MOVIDO DE LOGIN_SCREEN) ---
+              // --- SEÇÃO DO MAPA INTERATIVO ---
               _buildMapSection(), 
               
-              // --- BOTÕES DE AÇÃO (DESIGN ATUALIZADO) ---
+              // --- BOTÕES DE AÇÃO ---
               _buildActionButtons(context),
               
               const SizedBox(height: 20),
@@ -135,12 +132,12 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: const Color.fromRGBO(255, 255, 255, 0.2),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           _mapExpanded ? Icons.map : Icons.location_on,
-                          size: 60,
+                          size: 80,
                           color: Colors.white,
                         ),
                       ),
@@ -149,7 +146,7 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
                         _mapExpanded ? 'Carregando mapa...' : 'Explorar Mapa',
                         style: const TextStyle(
                           fontFamily: 'Helvetica',
-                          fontSize: 24, // Aumentado
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -180,12 +177,12 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Theme.of(context).scaffoldBackgroundColor,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
+                          children: [
                             Icon(
                               Icons.touch_app,
                               color: AppTheme.primaryColor,
@@ -201,6 +198,7 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
                                 color: AppTheme.primaryColor,
                               ),
                             ),
+                            SizedBox(width: 16),
                           ],
                         ),
                       ),
@@ -214,7 +212,7 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
     );
   }
 
-  /// Botões de Ação (DESIGN ATUALIZADO)
+  /// Botões de Ação
   Widget _buildActionButtons(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(24.0),
@@ -228,7 +226,6 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
               onPressed: () {
                 Navigator.of(context).pushNamed(AppConstants.routeLogin);
               },
-              // <<< ALTERADO: Estilo padrão do tema
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
                 foregroundColor: Colors.white,
@@ -251,7 +248,6 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
               onPressed: () {
                 Navigator.of(context).pushNamed(AppConstants.routeRegister);
               },
-              // <<< ALTERADO: Estilo padrão do tema
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppTheme.primaryColor,
                 side: const BorderSide(color: AppTheme.primaryColor, width: 2),
@@ -291,7 +287,7 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
   }
 }
 
-/// Classe Painter (MOVIDA DE LOGIN_SCREEN)
+/// Classe Painter
 class MapPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {

@@ -10,7 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-  
   # Banco de dados SQL (SQLite)
   sqflite: any
   path: any
@@ -19,9 +18,6 @@ dependencies:
   firebase_core: any
   firebase_auth: any
   
-  # Biometria
-  local_auth: ^3.0.0
-
   # Mapa (OpenStreetMap via flutter_map)
   flutter_map: any # Pacote de mapas open-source
   latlong2: any # Dependência para coordenadas do flutter_map
@@ -43,6 +39,12 @@ dependencies:
   
   # Shared Preferences para dados simples
   shared_preferences: any
+
+  # Ligações telefônicas
+  url_launcher: ^6.2.2
+  
+  # Formatação de datas
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
