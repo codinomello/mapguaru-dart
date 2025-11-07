@@ -93,6 +93,19 @@ class DatabaseHelper {
         )
       ''');
 
+      // Tabela de Notícias (relacionamento com usuários pode ser implementado futuramente)
+      await txn.execute('''
+        CREATE TABLE saved_news (
+          news_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          title TEXT NOT NULL,
+          description TEXT,
+          category TEXT,
+          published_at TEXT,
+          is_read INTEGER DEFAULT 0,
+          created_at TEXT
+        )
+      ''');
+
       // Popula categorias iniciais
       await _populateCategories(txn);
     });
@@ -297,4 +310,26 @@ class DatabaseHelper {
       WHERE f.user_id = ?
     ''', [userId]);
   }
+
+  // ==================== MÉTODOS PARA NOTÍCIAS ====================
+  Future<void> saveNews(Map<String, dynamic> news) async {
+    final db = await database;
+    await db.insert('saved_news', news);
+  }
+
+  Future<List<Map<String, dynamic>>> getSavedNews() async {
+    final db = await database;
+    return await db.query('saved_news', orderBy: 'published_at DESC');
+  }
+
+  Future<void> markNewsAsRead(int newsId) async {
+    final db = await database;
+    await db.update(
+      'saved_news',
+      {'is_read': 1},
+      where: 'news_id = ?',
+      whereArgs: [newsId],
+    );
+  }
 }
+

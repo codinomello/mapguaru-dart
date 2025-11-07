@@ -40,6 +40,12 @@ dependencies:
   # Shared Preferences para dados simples
   shared_preferences: any
 
+  # Ligações telefônicas
+  url_launcher: ^6.2.2
+  
+  # Formatação de datas
+  intl: ^0.18.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

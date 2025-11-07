@@ -20,6 +20,9 @@ import 'screens/category_detail_screen.dart';
 import 'screens/map_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/service_guide_screen.dart';
+import 'screens/emergency_screen.dart';
+import 'screens/news_screen.dart';
+import 'screens/city_guide_screen.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -158,6 +161,9 @@ class MapGuaruApp extends StatelessWidget {
         AppConstants.routeMap: (context) => const MapScreen(),
         AppConstants.routeProfile: (context) => const ProfileScreen(),
         AppConstants.routeServiceGuide: (context) => const ServiceGuideScreen(),
+        AppConstants.routeEmergency: (context) => const EmergencyScreen(),
+        AppConstants.routeNews: (context) => const NewsScreen(),
+        AppConstants.routeCityGuide: (context) => const CityGuideScreen(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == AppConstants.routeCategory) {
