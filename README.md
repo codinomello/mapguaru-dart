@@ -1,329 +1,387 @@
-# Guia de Configuração - MapGuaru
+Opa\! Esse README que você criou já está **excelente**. Ele é um dos mais completos que eu já vi para um projeto Flutter, parabéns\! A nível de informação, ele está 10/10.
 
-## 📋 Pré-requisitos
+A minha "atualização" não vai *remover* nada, porque tudo o que você colocou é valioso. O que eu vou fazer é **refinar a apresentação** para torná-lo ainda mais profissional e escaneável, usando alguns truques do GitHub:
 
-- Flutter SDK 3.x ou superior
-- Dart 3.x ou superior
-- Android Studio ou VS Code com extensões Flutter/Dart
-- Conta no Firebase (gratuita)
-- Git
+1.  **Shields (Selos) Dinâmicos:** Vamos usar selos mais "vivos" e alinhados ao centro.
+2.  **Seção de Screenshots:** A adição mais importante. Um app visual *precisa* de imagens logo de cara.
+3.  **Tags `<details>`:** Esta é a mudança principal. Para seções muito longas e densas (como a Estrutura de Pastas, o DB e as Funcionalidades por Tela), vamos "escondê-las" dentro de um *spoiler* clicável. Isso torna o README principal muito mais limpo e rápido de ler, mas mantém toda a informação valiosa para quem quiser se aprofundar.
 
-## 🔥 Configuração do Firebase
+Aqui está a versão refinada. Basta copiar e colar.
 
-### 1. Criar Projeto no Firebase
+-----
 
-1. Acesse [Firebase Console](https://console.firebase.google.com/)
-2. Clique em "Adicionar projeto"
-3. Nome do projeto: "MapGuaru" (ou outro de sua preferência)
-4. Siga os passos até finalizar a criação
+\<div align="center"\>
 
-### 2. Adicionar Aplicativo Android
+# 🗺️ MapGuaru
 
-1. No console do Firebase, clique no ícone do Android
-2. Nome do pacote: `com.mapguaru.app`
-3. Baixe o arquivo `google-services.json`
-4. Coloque o arquivo em: `android/app/google-services.json`
+**Seu guia para os serviços de Guarulhos**
 
-### 3. Adicionar Aplicativo iOS (opcional)
+\<p align="center"\>
+\<img alt="Flutter" src="[https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge\&logo=flutter](https://www.google.com/search?q=https://img.shields.io/badge/Flutter-3.x-02569B%3Fstyle%3Dfor-the-badge%26logo%3Dflutter)"/\>
+\<img alt="Dart" src="[https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge\&logo=dart](https://www.google.com/search?q=https://img.shields.io/badge/Dart-3.x-0175C2%3Fstyle%3Dfor-the-badge%26logo%3Ddart)"/\>
+\<a href="https://www.google.com/search?q=LICENSE"\>
+\<img alt="License" src="[https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge](https://www.google.com/search?q=https://img.shields.io/badge/License-MIT-yellow.svg%3Fstyle%3Dfor-the-badge)"/\>
+\</a\>
+\<img alt="GitHub last commit" src="[https://img.shields.io/github/last-commit/codinomello/mapguaru-dart?style=for-the-badge\&logo=github](https://www.google.com/search?q=https://img.shields.io/github/last-commit/codinomello/mapguaru-dart%3Fstyle%3Dfor-the-badge%26logo%3Dgithub)"\>
+\</p\>
 
-1. No console do Firebase, clique no ícone do iOS
-2. ID do pacote: `com.mapguaru.app`
-3. Baixe o arquivo `GoogleService-Info.plist`
-4. Coloque o arquivo em: `ios/Runner/GoogleService-Info.plist`
+\</div\>
 
-### 4. Ativar Métodos de Autenticação
+-----
 
-No Firebase Console:
+## 📱 Visão Geral
 
-1. Vá em **Authentication** > **Sign-in method**
-2. Ative os seguintes provedores:
+MapGuaru é um aplicativo mobile desenvolvido em Flutter que centraliza informações sobre serviços públicos e pontos de interesse da cidade de Guarulhos/SP. O app oferece navegação por categorias, visualização em mapa interativo com OpenStreetMap, sistema de favoritos e perfil de usuário completo.
 
-#### Email/Password
-- Status: **Ativado**
-- Nenhuma configuração adicional necessária
+**[⚠️ Recomendação Principal: Insira 2-3 screenshots ou um GIF do app aqui\!]**
 
-#### Google
-- Status: **Ativado**
-- Configuração:
-  - **Android**: Nenhuma configuração adicional
-  - **iOS**: Adicione o `REVERSED_CLIENT_ID` no `Info.plist`
+| Tela Principal | Tela de Mapa | Tela de Detalhes |
+| :---: | :---: | :---: |
+| `[Insira a imagem da Tela Principal aqui]` | `[Insira a imagem da Tela de Mapa aqui]` | `[Insira a imagem da Tela de Detalhes aqui]` |
 
-#### Facebook
-- Status: **Ativado**
-- Configuração:
-  1. Criar app no [Facebook Developers](https://developers.facebook.com/)
-  2. Copie App ID e App Secret
-  3. Cole no Firebase
-  4. Configure OAuth redirect URI:
-     ```
-     https://mapguaru-xxxxx.firebaseapp.com/__/auth/handler
-     ```
+-----
 
-#### GitHub
-- Status: **Ativado**
-- Configuração:
-  1. Criar OAuth App em [GitHub Settings](https://github.com/settings/developers)
-  2. Authorization callback URL:
-     ```
-     https://mapguaru-xxxxx.firebaseapp.com/__/auth/handler
-     ```
-  3. Copie Client ID e Client Secret
-  4. Cole no Firebase
+## ✨ Funcionalidades Principais
 
-## 📦 Instalação das Dependências
+  - ✅ **Autenticação de usuários** - Login e cadastro completo
+  - 🗂️ **6 Categorias de Serviços** - Saúde, Educação, Comunidade, Segurança, Transporte, Cultura & Lazer
+  - 🗺️ **Mapa Interativo** - Visualização com OpenStreetMap (`flutter_map`)
+  - ⭐ **Sistema de Favoritos** - Salve seus locais preferidos
+  - 👤 **Perfil de Usuário** - Gerencie suas informações
+  - 🔍 **Busca e Filtros** - Encontre serviços facilmente
+  - 📍 **Detalhes dos Locais** - Endereço, telefone, horários e mais
+  - 💾 **Banco de Dados Local** - SQLite para persistência de dados
 
-```bash
-# Clone o repositório
-git clone https://github.com/seu-usuario/mapguaru.git
-cd mapguaru
+-----
 
-# Instale as dependências
-flutter pub get
+## 🛠️ Tecnologias Utilizadas
 
-# Configure o Firebase CLI (primeira vez)
-dart pub global activate flutterfire_cli
-flutterfire configure
-```
+### Core
 
-## ⚙️ Configuração do Projeto
+  - **Flutter** 3.x
+  - **Dart** 3.x
 
-### 1. Atualizar `pubspec.yaml`
-
-Certifique-se de que as seguintes dependências estão instaladas:
+### Principais Pacotes
 
 ```yaml
 dependencies:
-  flutter:
-    sdk: flutter
-  
-  # Firebase
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.15.3
-  
-  # Banco de dados local
+  # Banco de dados
   sqflite: ^2.3.0
   path: ^1.8.3
   
-  # Mapas
+  # Mapas OpenStreetMap
   flutter_map: ^6.0.0
   latlong2: ^0.9.0
-  
-  # HTTP
-  http: ^1.1.2
   
   # Gerenciamento de estado
   provider: ^6.1.0
   
-  # Autenticação biométrica
-  local_auth: ^2.1.7
+  # Criptografia
+  crypto: ^3.0.3
   
-  # Armazenamento local
+  # Preferências
   shared_preferences: ^2.2.2
 ```
 
-### 2. Configurar `android/build.gradle`
+-----
 
-```gradle
-buildscript {
-    dependencies {
-        // Firebase
-        classpath 'com.google.gms:google-services:4.4.0'
-    }
-}
-```
+## 🚀 Como Executar
 
-### 3. Configurar `android/app/build.gradle`
+Siga os passos abaixo para rodar o projeto localmente.
 
-```gradle
-apply plugin: 'com.google.gms.google-services'
+### 1\. Pré-requisitos
 
-android {
-    compileSdkVersion 34
-    
-    defaultConfig {
-        minSdkVersion 23
-        targetSdkVersion 34
-    }
-}
-```
+  - Flutter SDK (versão 3.x ou superior)
+  - Android Studio ou VS Code com extensões Flutter/Dart
+  - Dispositivo Android/iOS ou emulador configurado
 
-### 4. Configurar Permissões
-
-#### Android (`android/app/src/main/AndroidManifest.xml`)
-
-```xml
-<manifest>
-    <!-- Permissões de internet -->
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    
-    <!-- Permissões de localização (opcional) -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    
-    <!-- Biometria -->
-    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
-    <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
-</manifest>
-```
-
-#### iOS (`ios/Runner/Info.plist`)
-
-```xml
-<dict>
-    <!-- Biometria -->
-    <key>NSFaceIDUsageDescription</key>
-    <string>Usamos Face ID para login rápido e seguro</string>
-    
-    <!-- Localização (opcional) -->
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Precisamos da sua localização para mostrar serviços próximos</string>
-</dict>
-```
-
-## 🗺️ Configuração da API do GeoNetwork
-
-O aplicativo se conecta automaticamente ao GeoNetwork de Guarulhos:
-
-```
-Base URL: https://geonetwork.guarulhos.sp.gov.br:8443
-```
-
-### Camadas Disponíveis
-
-O serviço busca automaticamente as seguintes camadas (ajuste conforme disponibilidade):
-
-- **Saúde**: `guarulhos:saude_equipamentos`, `guarulhos:hospitais`
-- **Educação**: `guarulhos:escolas_municipais`, `guarulhos:educacao`
-- **Comunidade**: `guarulhos:equipamentos_sociais`
-- **Segurança**: `guarulhos:seguranca_publica`
-- **Transporte**: `guarulhos:transporte_publico`
-- **Cultura**: `guarulhos:equipamentos_culturais`
-
-### Testar Conexão
+### 2\. Instalação
 
 ```bash
-# Liste camadas disponíveis
-curl "https://geonetwork.guarulhos.sp.gov.br:8443/geoserver/wfs?service=WFS&version=2.0.0&request=GetCapabilities"
+# Clone o repositório
+git clone https://github.com/codinomello/mapguaru-dart.git
 
-# Busque metadados
-curl "https://geonetwork.guarulhos.sp.gov.br:8443/geonetwork/srv/api/search/records/_search" \
-  -H "Content-Type: application/json" \
-  -d '{"query":{"query_string":{"query":"*"}}}'
-```
+# Entre na pasta do projeto
+cd mapguaru-dart
 
-## ▶️ Executando o Projeto
-
-### Modo Debug
-
-```bash
-# Android
-flutter run
-
-# iOS (requer macOS)
-flutter run -d ios
-
-# Web
-flutter run -d chrome
-```
-
-### Modo Release
-
-```bash
-# Android APK
-flutter build apk --release
-
-# Android App Bundle (para Play Store)
-flutter build appbundle --release
-
-# iOS
-flutter build ios --release
-```
-
-## 🧪 Testando Funcionalidades
-
-### 1. Login Email/Senha
-
-```dart
-// Email de teste
-email: teste@mapguaru.com.br
-senha: 123456
-```
-
-### 2. Login Social
-
-- **Google**: Use uma conta Google real
-- **Facebook**: Configure OAuth em developers.facebook.com
-- **GitHub**: Configure OAuth em github.com/settings/developers
-
-### 3. Biometria
-
-- **Android**: Configure impressão digital no emulador via Extended Controls
-- **iOS**: Configure Face ID/Touch ID no simulador
-
-## 🐛 Troubleshooting
-
-### Erro: "Multidex is disabled"
-
-```gradle
-// android/app/build.gradle
-android {
-    defaultConfig {
-        multiDexEnabled true
-    }
-}
-
-dependencies {
-    implementation 'androidx.multidex:multidex:2.0.1'
-}
-```
-
-### Erro: "Firebase not initialized"
-
-```bash
-# Reconfigure o Firebase
-flutterfire configure
-flutter clean
+# Instale as dependências
 flutter pub get
 ```
 
-### Erro: "Certificate verification failed"
+### 3\. Executando o App
 
-Para desenvolvimento local (GeoNetwork com certificado auto-assinado):
-
-```dart
-// Apenas para DESENVOLVIMENTO
-HttpOverrides.global = MyHttpOverrides();
-
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-  }
-}
+```bash
+# Inicie o app (certifique-se de ter um emulador/dispositivo conectado)
+flutter run
 ```
 
-### Erro: "Biometric not available"
+### 4\. Build para Produção
 
-- Certifique-se de que o dispositivo/emulador tem biometria configurada
-- Verifique as permissões no `AndroidManifest.xml` / `Info.plist`
+```bash
+# Gerar um APK (Android)
+flutter build apk --release
 
-## 📚 Recursos Adicionais
+# Gerar um app bundle (Android)
+flutter build appbundle --release
 
-- [Documentação Firebase](https://firebase.google.com/docs)
-- [Flutter Firebase Codelab](https://firebase.google.com/codelabs/firebase-get-to-know-flutter)
-- [GeoServer Documentation](https://docs.geoserver.org/)
-- [GeoNetwork Documentation](https://geonetwork-opensource.org/docs.html)
+# Gerar para iOS
+flutter build ios --release
+```
 
-## 🤝 Suporte
+-----
 
-Para dúvidas ou problemas:
+## 🎨 Design System
 
-1. Verifique as [Issues no GitHub](https://github.com/seu-usuario/mapguaru/issues)
-2. Crie uma nova issue com detalhes do erro
-3. Entre em contato: contato@mapguaru.com.br
+O aplicativo segue um guia de estilo simples e coeso:
 
----
+  - **Fonte Principal**: Helvetica
+  - **Cores das Categorias**:
+      - 🏥 Saúde: Roxo Escuro (`#4338CA`)
+      - 🎓 Educação: Verde (`#059669`)
+      - 👥 Comunidade: Vermelho (`#DC2626`)
+      - 🚨 Segurança: Amarelo (`#F59E0B`)
+      - 🚌 Transporte: Roxo (`#7C3AED`)
+      - 🎭 Cultura & Lazer: Laranja (`#EA580C`)
 
-**Desenvolvido com ❤️ para a cidade de Guarulhos**
+-----
+
+## 🔐 Segurança
+
+  - Senhas armazenadas com hash **SHA-256**
+  - Validação de inputs no client-side
+  - Proteção contra SQL Injection (uso de *prepared statements* do `sqflite`)
+  - Sessão de usuário gerenciada com `SharedPreferences`
+
+-----
+
+## 🗺️ Roadmap
+
+Funcionalidades planejadas para as próximas versões:
+
+### Versão 1.1 (Planejada)
+
+  - [ ] Notificações push para eventos
+  - [ ] Modo offline completo
+  - [ ] Integração com Google Maps (como alternativa)
+  - [ ] Compartilhamento de locais
+  - [ ] Avaliações e comentários de serviços
+
+### Versão 1.2 (Planejada)
+
+  - [ ] Dark mode (Modo Escuro)
+  - [ ] Múltiplos idiomas (pt-BR, en-US)
+  - [ ] Acessibilidade aprimorada (WCAG)
+  - [ ] Widget de busca rápida
+  - [ ] Histórico de locais visitados
+
+-----
+
+## 📂 Detalhes Técnicos do Projeto (Avançado)
+
+\<details\>
+\<summary\>\<b\>📁 Estrutura do Projeto\</b\>\</summary\>
+
+```
+lib/
+├── main.dart                   # Ponto de entrada do app
+├── models/
+│   ├── user.dart                 # Modelo de usuário
+│   ├── service_category.dart     # Modelo de categoria
+│   ├── service_unit.dart         # Modelo de unidade de serviço
+│   ├── required_document.dart    # Modelo de documento
+│   ├── favorite.dart             # Modelo de favorito
+│   └── news.dart                 # Modelo de notícia
+├── database/
+│   └── database_helper.dart      # Helper do SQLite
+├── screens/
+│   ├── splash_screen.dart        # Tela de splash
+│   ├── menu_screen.dart          # Menu inicial
+│   ├── login_screen.dart         # Tela de login
+│   ├── register_screen.dart      # Tela de cadastro
+│   ├── main_menu_screen.dart     # Menu principal
+│   ├── category_detail_screen.dart # Detalhes da categoria
+│   ├── map_screen.dart           # Mapa interativo
+│   ├── profile_screen.dart       # Perfil do usuário
+│   └── service_guide_screen.dart # Guia de serviços
+├── widgets/
+│   ├── category_card.dart        # Card de categoria
+│   ├── service_unit_card.dart    # Card de unidade
+│   └── custom_button.dart        # Botão customizado
+└── utils/
+    ├── constants.dart            # Constantes do app
+    └── theme.dart                # Tema e cores
+```
+
+\</details\>
+
+\<details\>
+\<summary\>\<b\>🗄️ Estrutura do Banco de Dados (SQLite)\</b\>\</summary\>
+
+#### `users`
+
+  - `user_id` (PK), `name`, `email` (UNIQUE), `password_hash`, `firebase_uid` (UNIQUE), `created_at`
+
+#### `service_categories`
+
+  - `category_id` (PK), `name`, `description`, `icon`
+
+#### `service_units`
+
+  - `unit_id` (PK), `category` (FK), `name`, `description`, `address`, `neighborhood`, `zip_code`, `city`, `state`, `latitude`, `longitude`, `opening_hours`, `phone`, `email`, `website`, `created_at`
+
+#### `required_documents`
+
+  - `document_id` (PK), `unit_id` (FK), `name`, `description`
+
+#### `favorites`
+
+  - `favorite_id` (PK), `user_id` (FK), `unit_id` (FK), `created_at`
+  - `UNIQUE(user_id, unit_id)`
+
+#### `news`
+
+  - `news_id` (PK), `title`, `description`, `location`, `start_date`, `end_date`, `service_type`, `created_at`
+
+\</details\>
+
+\<details\>
+\<summary\>\<b\>🔄 Fluxo de Navegação\</b\>\</summary\>
+
+```
+┌─────────────────┐
+│  Splash Screen  │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   Menu Inicial  │◄────┐
+│  Login/Cadastro │     │
+└────────┬────────┘     │
+         │              │
+    ┌────┼────┐        │
+    │    │    │        │
+    ▼    ▼    ▼        │
+┌───────┐ ┌──────┐      │
+│ Login │ │Regis-│      │
+│       │ │ tro  │      │
+└───┬───┘ └───┬──┘      │
+    │         │         │
+    └────┬────┘         │
+         │              │
+         ▼              │
+┌─────────────────┐     │
+│  Menu Principal │     │
+│ (6 Categorias)  │     │
+└────────┬────────┘     │
+         │              │
+    ┌────┼─────┬───────┤
+    │    │     │       │
+    ▼    ▼     ▼       ▼
+┌────────┐ ┌────┐ ┌──────┐
+│Detalhes│ │Mapa│ │Perfil│
+│Categoria│ │    │ │       │
+└────────┘ └────┘ └──┬───┘
+                     │
+                     ▼
+                 ┌────────┐
+                 │ Logout │
+                 └────────┘
+```
+
+\</details\>
+
+\<details\>
+\<summary\>\<b\>📝 Funcionalidades por Tela\</b\>\</summary\>
+
+### 1\. Splash Screen
+
+  - Animação de entrada com logo
+  - Carregamento de dados iniciais
+  - Navegação automática
+
+### 2\. Menu Inicial
+
+  - Opções de Login e Cadastro
+  - Acesso como visitante
+  - Login social (Facebook, WhatsApp, Instagram)
+
+### 3\. Login
+
+  - Validação de email e senha
+  - Recuperação de senha
+  - Feedback visual de erros
+
+### 4\. Cadastro
+
+  - Validação de dados
+  - Confirmação de senha
+  - Aceite de termos de uso
+
+### 5\. Menu Principal
+
+  - Grid de 6 categorias
+  - Boas-vindas personalizadas
+  - Acesso rápido ao perfil
+  - Botão flutuante para mapa
+
+### 6\. Detalhes da Categoria
+
+  - Lista de unidades
+  - Busca por nome/bairro
+  - Sistema de favoritos
+  - Visualização em mapa
+
+### 7\. Mapa Interativo
+
+  - Marcadores coloridos por categoria
+  - Filtro por categoria
+  - Detalhes ao clicar no marcador
+  - Lista de locais
+  - Centralização e zoom
+
+### 8\. Perfil
+
+  - Informações do usuário
+  - Edição de nome
+  - Lista de favoritos
+  - Documentos necessários
+  - Logout
+
+### 9\. Guia de Serviços
+
+  - Tutorial de uso
+  - Descrição das categorias
+  - Dicas úteis
+  - Informações de contato
+
+\</details\>
+
+-----
+
+## 🤝 Contribuindo
+
+Contribuições são muito bem-vindas\! Se você tem ideias para melhorias ou encontrou algum bug, sinta-se à vontade para:
+
+1.  Fazer um **Fork** do projeto.
+2.  Criar uma nova **Branch** (`git checkout -b feature/MinhaFeature`).
+3.  Fazer **Commit** das suas mudanças (`git commit -m 'Adiciona MinhaFeature'`).
+4.  Fazer **Push** para a Branch (`git push origin feature/MinhaFeature`).
+5.  Abrir um **Pull Request**.
+
+Para problemas, abra uma [Issue](https://www.google.com/search?q=https://github.com/codinomello/mapguaru-dart/issues).
+
+## 📄 Licença
+
+Este projeto é distribuído sob a licença MIT. Veja o arquivo [LICENSE](https://www.google.com/search?q=LICENSE) para mais detalhes.
+
+-----
+
+\<div align="center"\>
+
+**Desenvolvido com 💙 para a cidade de Guarulhos**
+<br>
+Projeto acadêmico de desenvolvimento mobile
+<br><br>
+**⭐ Se este projeto foi útil, deixe uma estrela no GitHub\! ⭐**
+
+\</div\>
