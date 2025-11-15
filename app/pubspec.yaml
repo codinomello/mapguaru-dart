@@ -44,10 +44,10 @@ dependencies:
   font_awesome_flutter: any
 
   # Ligações telefônicas
-  url_launcher: ^6.2.2
+  url_launcher: any
   
   # Formatação de datas
-  intl: ^0.18.1
+  intl: any
 
   # Rota para localização do usuário
   geolocator: any
