@@ -151,11 +151,11 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
           colors: [
             AppTheme.primaryColor,
-            AppTheme.primaryColor.withOpacity(0.8),
+            AppTheme.secondaryColor
           ],
         ),
       ),
@@ -164,8 +164,8 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
         children: [
           Text(
             userProvider.isLoggedIn
-                ? 'Olá, ${userProvider.userName?.split(' ')[0] ?? 'Usuário'}!'
-                : 'Olá, Visitante!',
+                ? '👋 Olá, ${userProvider.userName?.split(' ')[0] ?? 'Usuário'}!'
+                : '👋 Olá, Visitante!',
             style: const TextStyle(
               fontFamily: 'Helvetica',
               fontSize: 24,
@@ -397,7 +397,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
             description: 'Aprenda a usar o mapa interativo',
             onTap: () {
               // Navegar para guia do mapa
-              _showComingSoon();
+              Navigator.of(context).pushNamed(AppConstants.routeMapGuide);
             },
           ),
           const SizedBox(height: 12),
@@ -416,9 +416,10 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
             description: 'Configure suas preferências',
             onTap: () {
               // Navegar para guia do perfil
-              _showComingSoon();
+              Navigator.of(context).pushNamed(AppConstants.routeProfileGuide);
             },
           ),
+          const SizedBox(height: 60),
         ],
       ),
     );
@@ -494,13 +495,13 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   }
 
   /// Mostra mensagem de "Em breve"
-  void _showComingSoon() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Funcionalidade em desenvolvimento'),
-        backgroundColor: AppTheme.info,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
+  // void _showComingSoon() {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(
+  //       content: Text('Funcionalidade em desenvolvimento'),
+  //       backgroundColor: AppTheme.info,
+  //       behavior: SnackBarBehavior.floating,
+  //     ),
+  //   );
+  // }
 }

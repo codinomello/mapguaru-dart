@@ -102,12 +102,16 @@ class AppConstants {
   static const String routeCategory = '/category';
   static const String routeMap = '/map';
   static const String routeProfile = '/profile';
-   static const String routeEmergency = '/emergency';
+  static const String routeEmergency = '/emergency';
   static const String routeNews = '/news';
-  static const String routeServiceGuide = '/service-guide';
+  static const String routeAdminPanel = '/admin';
   static const String routeMapGuide = '/map-guide';
+  static const String routeServiceGuide = '/service-guide';
   static const String routeProfileGuide = '/profile-guide';
   static const String routeCityGuide = '/city-guide';
+  static const String routeMyMarkers = 'my-markers';
+  static const String routeForgotPassword = '/forgot-password';
+  static const String routeUpgradeAccount = '/upgrade-account';
 
   // ==================== DADOS DE EXEMPLO ====================
   

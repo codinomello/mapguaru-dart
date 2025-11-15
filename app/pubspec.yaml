@@ -40,11 +40,17 @@ dependencies:
   # Shared Preferences para dados simples
   shared_preferences: any
 
+  # Brand icons
+  font_awesome_flutter: any
+
   # Ligações telefônicas
   url_launcher: ^6.2.2
   
   # Formatação de datas
   intl: ^0.18.1
+
+  # Rota para localização do usuário
+  geolocator: any
 
 dev_dependencies:
   flutter_test:

@@ -32,6 +32,13 @@ class _CityGuideScreenState extends State<CityGuideScreen> with SingleTickerProv
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
+          // Forçar cores explícitas para evitar que a aba selecionada fique
+          // invisível dependendo do tema/AppBar. Usa o esquema de cores
+          // do tema para manter consistência com o restante da UI.
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white,
+          indicatorColor: Colors.white,
+          indicatorWeight: 3.0,
           tabs: const [
             Tab(icon: Icon(Icons.history), text: 'História'),
             Tab(icon: Icon(Icons.lightbulb), text: 'Curiosidades'),
