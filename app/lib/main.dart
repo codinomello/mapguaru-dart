@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mapguaru/screens/admin_panel.dart';
+import 'package:mapguaru/screens/upgrade_account_screen.dart';
 import 'package:mapguaru/services/geonetwork_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,7 +20,9 @@ import 'screens/forgot_password_screen.dart';
 import 'screens/main_menu_screen.dart';
 import 'screens/category_detail_screen.dart';
 import 'screens/map_screen.dart';
+import 'screens/map_guide_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/profile_guide_screen.dart';
 import 'screens/service_guide_screen.dart';
 import 'screens/emergency_screen.dart';
 import 'screens/news_screen.dart';
@@ -72,14 +76,14 @@ Future<void> _initializeDataFromAPI(DatabaseHelper dbHelper) async {
   if (!isFirstTime && lastUpdate != null) {
     final lastUpdateDate = DateTime.parse(lastUpdate);
     final daysSinceUpdate = DateTime.now().difference(lastUpdateDate).inDays;
-    needsUpdate = daysSinceUpdate > 7;
+    needsUpdate = daysSinceUpdate > 7; // Atualiza semanalmente
   }
 
   if (needsUpdate) {
     debugPrint('🔄 Atualizando dados da API...');
     
     try {
-      // Busca camadas disponíveis
+      // Busca camadas WMS (opcional, mas útil para mapa)
       final availableLayers = await GeoNetworkService.getWMSLayers();
       debugPrint('📋 ${availableLayers.length} camadas WMS encontradas');
       
@@ -88,7 +92,7 @@ Future<void> _initializeDataFromAPI(DatabaseHelper dbHelper) async {
       
       if (units.isNotEmpty) {
         int insertedCount = 0;
-        
+        await dbHelper.clearServiceUnits(); // Limpa dados velhos antes de inserir novos
         for (var unit in units) {
           try {
             await dbHelper.insertServiceUnit(unit);
@@ -97,7 +101,6 @@ Future<void> _initializeDataFromAPI(DatabaseHelper dbHelper) async {
             debugPrint('⚠️ Erro ao inserir unidade: $e');
           }
         }
-        
         debugPrint('✅ $insertedCount unidades inseridas');
         
         await prefs.setString(
@@ -105,25 +108,23 @@ Future<void> _initializeDataFromAPI(DatabaseHelper dbHelper) async {
           DateTime.now().toIso8601String(),
         );
       } else {
-        debugPrint('⚠️ Nenhum dado retornado da API');
-        
-        if (isFirstTime) {
-          debugPrint('📦 Usando dados de exemplo...');
-          await _insertSampleData(dbHelper);
-        }
+        debugPrint('⚠️ Nenhum dado da API. Usando exemplos...');
+        await _insertSampleData(dbHelper); // Sempre fallback
       }
     } catch (e) {
-      debugPrint('❌ Erro ao buscar dados da API: $e');
-      
-      if (isFirstTime) {
-        debugPrint('📦 Usando dados de exemplo...');
-        await _insertSampleData(dbHelper);
-      }
+      debugPrint('❌ Erro na API: $e. Usando exemplos...');
+      await _insertSampleData(dbHelper); // Fallback obrigatório
     }
     
     await prefs.setBool(AppConstants.keyFirstTime, false);
   } else {
-    debugPrint('✅ Dados já estão atualizados');
+    debugPrint('✅ Dados atualizados. Verificando contagem...');
+    final unitCount = await dbHelper.getServiceUnitCount(); // Adicione isso no DatabaseHelper
+    debugPrint('📊 ${unitCount} unidades no DB');
+    if (unitCount == 0) {
+      debugPrint('⚠️ DB vazio. Inserindo exemplos...');
+      await _insertSampleData(dbHelper);
+    }
   }
 }
 
@@ -156,14 +157,18 @@ class MapGuaruApp extends StatelessWidget {
         AppConstants.routeMenu: (context) => const MenuScreen(),
         AppConstants.routeLogin: (context) => const LoginScreen(),
         AppConstants.routeRegister: (context) => const RegisterScreen(),
-        '/forgot-password': (context) => const ForgotPasswordScreen(),
+        AppConstants.routeForgotPassword: (context) => const ForgotPasswordScreen(),
         AppConstants.routeMainMenu: (context) => const MainMenuScreen(),
         AppConstants.routeMap: (context) => const MapScreen(),
         AppConstants.routeProfile: (context) => const ProfileScreen(),
+        AppConstants.routeMapGuide: (context) => const MapGuideScreen(),
         AppConstants.routeServiceGuide: (context) => const ServiceGuideScreen(),
+        AppConstants.routeProfileGuide: (context) => const ProfileGuideScreen(),
+        AppConstants.routeCityGuide: (context) => const CityGuideScreen(),
         AppConstants.routeEmergency: (context) => const EmergencyScreen(),
         AppConstants.routeNews: (context) => const NewsScreen(),
-        AppConstants.routeCityGuide: (context) => const CityGuideScreen(),
+        AppConstants.routeAdminPanel: (context) => const AdminPanelScreen(),
+        AppConstants.routeUpgradeAccount: (context) => const UpgradeAccountScreen(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == AppConstants.routeCategory) {

@@ -40,9 +40,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   /// Envia email de recuperação
   Future<void> _sendResetEmail() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
-
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
       final success = await authService.sendPasswordResetEmail(
@@ -64,7 +62,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       }
     } catch (e) {
       if (mounted) {
-        _showSnackBar('Erro ao enviar email de recuperação');
+        _showSnackBar('Erro ao enviar email de recuperação: $e');
       }
     } finally {
       if (mounted) {

@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 /// Serviço centralizado de autenticação
 /// 
 /// Gerencia autenticação via Firebase (Google, Facebook, GitHub),
-/// autenticação biométrica local e gerenciamento de sessão
+/// usando apenas Firebase Auth Provider nativo
 class AuthService with ChangeNotifier {
   final firebase_auth.FirebaseAuth _firebaseAuth = firebase_auth.FirebaseAuth.instance;
 
@@ -80,28 +80,161 @@ class AuthService with ChangeNotifier {
     }
   }
 
+  // ==================== AUTENTICAÇÃO ANÔNIMA ====================
+
+  /// Login anônimo (sem credenciais)
+  /// 
+  /// Permite que o usuário explore o app sem criar conta.
+  /// Dados são perdidos se desinstalar o app ou limpar cache.
+  Future<firebase_auth.UserCredential?> signInAnonymously() async {
+    try {
+      debugPrint('👤 Iniciando login anônimo...');
+      
+      final credential = await _firebaseAuth.signInAnonymously();
+      
+      _user = credential.user;
+      notifyListeners();
+      
+      debugPrint('✅ Login anônimo bem-sucedido');
+      debugPrint('   UID: ${_user?.uid}');
+      debugPrint('   É anônimo: ${_user?.isAnonymous}');
+      
+      return credential;
+      
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      debugPrint('❌ Erro no login anônimo: ${e.code} - ${e.message}');
+      _handleAuthException(e);
+      return null;
+    } catch (e, stack) {
+      debugPrint('❌ Erro inesperado no login anônimo: $e');
+      debugPrint('Stack: $stack');
+      return null;
+    }
+  }
+
+  /// Converte conta anônima em conta permanente com email/senha
+  /// 
+  /// Permite que o usuário mantenha seus dados ao criar uma conta real
+  Future<firebase_auth.UserCredential?> linkAnonymousWithEmailPassword(
+    String email,
+    String password,
+    String displayName,
+  ) async {
+    try {
+      if (_user == null || !_user!.isAnonymous) {
+        debugPrint('⚠️ Usuário não está logado anonimamente');
+        return null;
+      }
+
+      debugPrint('🔗 Vinculando conta anônima com email/senha...');
+      
+      // Cria credencial de email/senha
+      final credential = firebase_auth.EmailAuthProvider.credential(
+        email: email,
+        password: password,
+      );
+
+      // Vincula com a conta anônima existente
+      final userCredential = await _user!.linkWithCredential(credential);
+      
+      // Atualiza nome
+      await userCredential.user?.updateDisplayName(displayName);
+      
+      _user = userCredential.user;
+      notifyListeners();
+      
+      debugPrint('✅ Conta anônima convertida com sucesso');
+      debugPrint('   Email: ${_user?.email}');
+      debugPrint('   É anônimo: ${_user?.isAnonymous}');
+      
+      return userCredential;
+      
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      debugPrint('❌ Erro ao vincular conta: ${e.code} - ${e.message}');
+      _handleAuthException(e);
+      return null;
+    }
+  }
+
+  /// Converte conta anônima vinculando com provedor social (Google, etc)
+  Future<firebase_auth.UserCredential?> linkAnonymousWithProvider(
+    firebase_auth.AuthProvider provider,
+  ) async {
+    try {
+      if (_user == null || !_user!.isAnonymous) {
+        debugPrint('⚠️ Usuário não está logado anonimamente');
+        return null;
+      }
+
+      debugPrint('🔗 Vinculando conta anônima com provedor social...');
+      
+      firebase_auth.UserCredential? userCredential;
+      
+      if (kIsWeb) {
+        userCredential = await _user!.linkWithPopup(provider);
+      } else {
+        userCredential = await _user!.linkWithProvider(provider);
+      }
+      
+      _user = userCredential.user;
+      notifyListeners();
+      
+      debugPrint('✅ Conta anônima vinculada com sucesso');
+      debugPrint('   Email: ${_user?.email}');
+      debugPrint('   É anônimo: ${_user?.isAnonymous}');
+      
+      return userCredential;
+      
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      debugPrint('❌ Erro ao vincular com provedor: ${e.code} - ${e.message}');
+      _handleAuthException(e);
+      return null;
+    }
+  }
+
+  /// Verifica se usuário atual é anônimo
+  bool get isAnonymous => _user?.isAnonymous ?? false;
+
   // ==================== AUTENTICAÇÃO SOCIAL ====================
 
-  /// Login com Google
+  /// Login com Google (usando Firebase Provider nativo)
   Future<firebase_auth.UserCredential?> signInWithGoogle() async {
     try {
-      debugPrint('🔐 Iniciando login com Google...');
+      debugPrint('🔐 Iniciando login com Google via Firebase...');
       
-      final provider = firebase_auth.GoogleAuthProvider();
-      provider.addScope('email');
-      provider.addScope('profile');
+      // Cria provider do Google
+      final googleProvider = firebase_auth.GoogleAuthProvider();
+      googleProvider.addScope('email');
+      googleProvider.addScope('profile');
+      
+      // Define parâmetros customizados (opcional)
+      googleProvider.setCustomParameters({
+        'prompt': 'select_account', // Sempre mostra seleção de conta
+      });
 
-      final credential = kIsWeb
-          ? await _firebaseAuth.signInWithPopup(provider)
-          : await _firebaseAuth.signInWithProvider(provider);
+      firebase_auth.UserCredential? credential;
+      
+      if (kIsWeb) {
+        // Para Web: usa popup
+        debugPrint('🌐 Autenticação web com popup...');
+        credential = await _firebaseAuth.signInWithPopup(googleProvider);
+      } else {
+        // Para Mobile: usa redirect/native
+        debugPrint('📱 Autenticação mobile...');
+        credential = await _firebaseAuth.signInWithProvider(googleProvider);
+      }
 
       _user = credential.user;
       notifyListeners();
       
-      debugPrint('✅ Login com Google bem-sucedido');
+      debugPrint('✅ Login com Google bem-sucedido: ${_user?.email}');
+      debugPrint('   Display Name: ${_user?.displayName}');
+      debugPrint('   UID: ${_user?.uid}');
+      
       return credential;
+      
     } on firebase_auth.FirebaseAuthException catch (e) {
-      debugPrint('❌ Erro no login com Google: ${e.code}');
+      debugPrint('❌ Erro Firebase no login com Google: ${e.code} - ${e.message}');
       _handleAuthException(e);
       return null;
     } catch (e, stack) {
@@ -116,21 +249,30 @@ class AuthService with ChangeNotifier {
     try {
       debugPrint('🔐 Iniciando login com Facebook...');
       
-      final provider = firebase_auth.FacebookAuthProvider();
-      provider.addScope('email');
-      provider.addScope('public_profile');
+      final facebookProvider = firebase_auth.FacebookAuthProvider();
+      facebookProvider.addScope('email');
+      facebookProvider.addScope('public_profile');
+      
+      facebookProvider.setCustomParameters({
+        'display': 'popup',
+      });
 
-      final credential = kIsWeb
-          ? await _firebaseAuth.signInWithPopup(provider)
-          : await _firebaseAuth.signInWithProvider(provider);
+      firebase_auth.UserCredential? credential;
+      
+      if (kIsWeb) {
+        credential = await _firebaseAuth.signInWithPopup(facebookProvider);
+      } else {
+        credential = await _firebaseAuth.signInWithProvider(facebookProvider);
+      }
 
       _user = credential.user;
       notifyListeners();
       
-      debugPrint('✅ Login com Facebook bem-sucedido');
+      debugPrint('✅ Login com Facebook bem-sucedido: ${_user?.email}');
       return credential;
+      
     } on firebase_auth.FirebaseAuthException catch (e) {
-      debugPrint('❌ Erro no login com Facebook: ${e.code}');
+      debugPrint('❌ Erro no login com Facebook: ${e.code} - ${e.message}');
       _handleAuthException(e);
       return null;
     } catch (e, stack) {
@@ -145,21 +287,26 @@ class AuthService with ChangeNotifier {
     try {
       debugPrint('🔐 Iniciando login com GitHub...');
       
-      final provider = firebase_auth.GithubAuthProvider();
-      provider.addScope('user:email');
-      provider.addScope('read:user');
+      final githubProvider = firebase_auth.GithubAuthProvider();
+      githubProvider.addScope('user:email');
+      githubProvider.addScope('read:user');
 
-      final credential = kIsWeb
-          ? await _firebaseAuth.signInWithPopup(provider)
-          : await _firebaseAuth.signInWithProvider(provider);
+      firebase_auth.UserCredential? credential;
+      
+      if (kIsWeb) {
+        credential = await _firebaseAuth.signInWithPopup(githubProvider);
+      } else {
+        credential = await _firebaseAuth.signInWithProvider(githubProvider);
+      }
 
       _user = credential.user;
       notifyListeners();
       
-      debugPrint('✅ Login com GitHub bem-sucedido');
+      debugPrint('✅ Login com GitHub bem-sucedido: ${_user?.email}');
       return credential;
+      
     } on firebase_auth.FirebaseAuthException catch (e) {
-      debugPrint('❌ Erro no login com GitHub: ${e.code}');
+      debugPrint('❌ Erro no login com GitHub: ${e.code} - ${e.message}');
       _handleAuthException(e);
       return null;
     } catch (e, stack) {
@@ -168,6 +315,7 @@ class AuthService with ChangeNotifier {
       return null;
     }
   }
+
   // ==================== GERENCIAMENTO DE SESSÃO ====================
 
   /// Faz logout

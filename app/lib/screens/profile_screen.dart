@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../services/auth_service.dart';
 import '../database/database_helper.dart';
 import '../models/service_unit_model.dart';
 import '../utils/constants.dart';
@@ -113,8 +114,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // Header do perfil
                   _buildProfileHeader(userProvider),
                   
+                  // Alerta de conta anônima
+                  _buildAnonymousAlert(),
+
                   const SizedBox(height: 24),
-                  
+
                   // Informações da conta
                   if (userProvider.isLoggedIn) ...[
                     _buildAccountInfo(userProvider),
@@ -127,6 +131,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 24),
                   ],
                   
+                  const SizedBox(height: 24),
+                  _buildMyMarkersSection(),
+                  const SizedBox(height: 24),
+
                   // Documentos necessários
                   _buildDocumentsSection(),
                   
@@ -212,6 +220,226 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: const Text('Fazer Login'),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnonymousAlert() {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    
+    // Só mostra se usuário é anônimo
+    if (!authService.isAnonymous) return const SizedBox.shrink();
+    
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Card(
+        color: AppTheme.warning.withOpacity(0.1),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: AppTheme.warning.withOpacity(0.5),
+            width: 2,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.warning.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.warning_amber,
+                      color: AppTheme.warning,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Conta Temporária',
+                          style: TextStyle(
+                            fontFamily: 'Helvetica',
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Seus dados serão perdidos se desinstalar o app',
+                          style: TextStyle(
+                            fontFamily: 'Helvetica',
+                            fontSize: 12,
+                            color: Theme.of(context).textTheme.bodyMedium?.color,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const Divider(height: 1),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        // Mostrar mais informações
+                        _showAnonymousInfoDialog();
+                      },
+                      icon: const Icon(Icons.info_outline, size: 18),
+                      label: const Text('Saiba mais'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppTheme.warning,
+                        side: BorderSide(color: AppTheme.warning),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        // Navegar para upgrade
+                        Navigator.of(context).pushNamed('/upgrade-account');
+                      },
+                      icon: const Icon(Icons.upgrade, size: 18),
+                      label: const Text('Criar Conta'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.warning,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Dialog com informações sobre conta anônima
+  void _showAnonymousInfoDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.info_outline, color: AppTheme.info),
+            SizedBox(width: 12),
+            Text('Conta Temporária'),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Você está usando o MapGuaru como visitante.',
+                style: TextStyle(
+                  fontFamily: 'Helvetica',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildInfoItem(
+                Icons.check_circle_outline,
+                'Você pode explorar todos os serviços',
+                AppTheme.success,
+              ),
+              _buildInfoItem(
+                Icons.check_circle_outline,
+                'Pode usar o mapa interativo',
+                AppTheme.success,
+              ),
+              _buildInfoItem(
+                Icons.cancel_outlined,
+                'Não pode salvar favoritos',
+                AppTheme.error,
+              ),
+              _buildInfoItem(
+                Icons.cancel_outlined,
+                'Dados perdidos se desinstalar',
+                AppTheme.error,
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.warning.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.lightbulb_outline, 
+                      color: AppTheme.warning, 
+                      size: 20,
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Crie uma conta para salvar seus favoritos permanentemente!',
+                        style: TextStyle(
+                          fontFamily: 'Helvetica',
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Entendi'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.of(context).pushNamed('/upgrade-account');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.warning,
+            ),
+            child: const Text('Criar Conta'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoItem(IconData icon, String text, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: color),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontFamily: 'Helvetica',
+                fontSize: 13,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -453,6 +681,73 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildMyMarkersSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Meus Marcadores',
+            style: TextStyle(
+              fontFamily: 'Helvetica',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).textTheme.titleLarge?.color,
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          FutureBuilder<int>(
+            future: DatabaseHelper().countUserCustomMarkers(
+              Provider.of<UserProvider>(context, listen: false).userId ?? 0,
+            ),
+            builder: (context, snapshot) {
+              final count = snapshot.data ?? 0;
+              
+              return Card(
+                child: ListTile(
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppTheme.accentColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.add_location_alt,
+                      color: AppTheme.accentColor,
+                      size: 20,
+                    ),
+                  ),
+                  title: const Text(
+                    'Marcadores Personalizados',
+                    style: TextStyle(
+                      fontFamily: 'Helvetica',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  subtitle: Text(
+                    '$count ${count == 1 ? 'marcador' : 'marcadores'}',
+                    style: const TextStyle(
+                      fontFamily: 'Helvetica',
+                      fontSize: 12,
+                    ),
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/my-markers');
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Constrói seção de documentos necessários
   Widget _buildDocumentsSection() {
     return Padding(
@@ -608,4 +903,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+  
 }

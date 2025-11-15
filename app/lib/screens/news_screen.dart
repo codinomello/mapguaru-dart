@@ -109,9 +109,11 @@ class _NewsScreenState extends State<NewsScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
           colors: [
             AppTheme.primaryColor,
-            AppTheme.primaryColor.withOpacity(0.8),
+            AppTheme.secondaryColor
           ],
         ),
       ),

@@ -1,7 +1,7 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
-
+import 'dart:math' as math;
 /// Helper para gerenciamento do banco de dados SQLite local
 /// 
 /// Implementa padrão Singleton para garantir única instância do banco
@@ -106,6 +106,26 @@ class DatabaseHelper {
         )
       ''');
 
+      // Tabela de Marcadores Personalizados
+      await txn.execute('''
+        CREATE TABLE custom_markers (
+          marker_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          name TEXT NOT NULL,
+          description TEXT,
+          address TEXT,
+          latitude REAL NOT NULL,
+          longitude REAL NOT NULL,
+          category TEXT,
+          icon TEXT,
+          color TEXT,
+          is_favorite INTEGER DEFAULT 0,
+          created_at TEXT NOT NULL,
+          updated_at TEXT,
+          FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
+        )
+      ''');
+
       // Popula categorias iniciais
       await _populateCategories(txn);
     });
@@ -127,6 +147,17 @@ class DatabaseHelper {
     }
   }
 
+  Future<void> clearServiceUnits() async {
+    final db = await database;
+    await db.delete('service_units');
+  }
+
+  Future<int> getServiceUnitCount() async {
+    final db = await database;
+    final result = await db.query('service_units');
+    return result.length;
+  }
+  
   // ==================== MÉTODOS PARA USUÁRIOS ====================
 
   /// Registra novo usuário no banco local
@@ -331,5 +362,292 @@ class DatabaseHelper {
       whereArgs: [newsId],
     );
   }
-}
 
+  /// Busca todos os usuários
+  Future<List<Map<String, dynamic>>> getAllUsers() async {
+    final db = await database;
+    return await db.query('users', orderBy: 'user_id DESC');
+  }
+
+  /// Deleta um usuário
+  Future<void> deleteUser(int userId) async {
+    final db = await database;
+    await db.delete(
+      'users',
+      where: 'user_id = ?',
+      whereArgs: [userId],
+    );
+  }
+
+  /// Deleta uma unidade de serviço
+  Future<void> deleteServiceUnit(int unitId) async {
+    final db = await database;
+    await db.delete(
+      'service_units',
+      where: 'unit_id = ?',
+      whereArgs: [unitId],
+    );
+  }
+
+  /// Conta total de favoritos no sistema
+  Future<int> countAllFavorites() async {
+    final db = await database;
+    final result = await db.rawQuery('SELECT COUNT(*) as count FROM favorites');
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
+
+  /// Busca estatísticas de usuários por categoria
+  Future<Map<String, int>> getUserStatsByCategory() async {
+    final db = await database;
+    final stats = <String, int>{};
+    
+    for (var i = 1; i <= 6; i++) {
+      final result = await db.rawQuery('''
+        SELECT COUNT(DISTINCT f.user_id) as count
+        FROM favorites f
+        INNER JOIN service_units u ON f.unit_id = u.unit_id
+        WHERE u.category_id = ?
+      ''', [i]);
+      
+      stats['category_$i'] = Sqflite.firstIntValue(result) ?? 0;
+    }
+    
+    return stats;
+  }
+
+  /// Busca unidades mais favoritadas
+  Future<List<Map<String, dynamic>>> getMostFavoritedUnits({int limit = 10}) async {
+    final db = await database;
+    return await db.rawQuery('''
+      SELECT u.*, COUNT(f.unit_id) as favorite_count
+      FROM service_units u
+      LEFT JOIN favorites f ON u.unit_id = f.unit_id
+      GROUP BY u.unit_id
+      ORDER BY favorite_count DESC
+      LIMIT ?
+    ''', [limit]);
+  }
+
+  /// Busca usuários mais ativos (com mais favoritos)
+  Future<List<Map<String, dynamic>>> getMostActiveUsers({int limit = 10}) async {
+    final db = await database;
+    return await db.rawQuery('''
+      SELECT u.*, COUNT(f.unit_id) as favorite_count
+      FROM users u
+      LEFT JOIN favorites f ON u.user_id = f.user_id
+      GROUP BY u.user_id
+      ORDER BY favorite_count DESC
+      LIMIT ?
+    ''', [limit]);
+  }
+
+  /// Limpa todas as tabelas do banco 
+  Future<void> clearAllTables() async {
+    final db = await database;
+    await db.transaction((txn) async {
+      await txn.delete('favorites');
+      await txn.delete('saved_news');
+      await txn.delete('service_units');
+      await txn.delete('users');
+    });
+  }
+
+  /// Exporta dados do banco como JSON
+  Future<Map<String, dynamic>> exportDatabaseAsJson() async {
+    final db = await database;
+    
+    return {
+      'users': await db.query('users'),
+      'categories': await db.query('categories'),
+      'service_units': await db.query('service_units'),
+      'favorites': await db.query('favorites'),
+      'saved_news': await db.query('saved_news'),
+      'export_date': DateTime.now().toIso8601String(),
+    };
+  }
+
+  /// Importa dados de um JSON
+  Future<void> importDatabaseFromJson(Map<String, dynamic> data) async {
+    final db = await database;
+    
+    await db.transaction((txn) async {
+      // Limpa dados existentes
+      await txn.delete('favorites');
+      await txn.delete('saved_news');
+      await txn.delete('service_units');
+      await txn.delete('users');
+      
+      // Importa novos dados
+      if (data.containsKey('users')) {
+        for (var user in data['users']) {
+          await txn.insert('users', user);
+        }
+      }
+      
+      if (data.containsKey('service_units')) {
+        for (var unit in data['service_units']) {
+          await txn.insert('service_units', unit);
+        }
+      }
+      
+      if (data.containsKey('favorites')) {
+        for (var favorite in data['favorites']) {
+          await txn.insert('favorites', favorite);
+        }
+      }
+      
+      if (data.containsKey('saved_news')) {
+        for (var news in data['saved_news']) {
+          await txn.insert('saved_news', news);
+        }
+      }
+    });
+  }
+
+  // ==================== MÉTODOS PARA MARCADORES PERSONALIZADOS ====================
+
+  /// Adiciona um marcador personalizado
+  Future<int> addCustomMarker(Map<String, dynamic> marker) async {
+    final db = await database;
+    return await db.insert(
+      'custom_markers',
+      marker,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  /// Busca todos os marcadores de um usuário
+  Future<List<Map<String, dynamic>>> getUserCustomMarkers(int userId) async {
+    final db = await database;
+    return await db.query(
+      'custom_markers',
+      where: 'user_id = ?',
+      whereArgs: [userId],
+      orderBy: 'created_at DESC',
+    );
+  }
+
+  /// Busca um marcador específico por ID
+  Future<Map<String, dynamic>?> getCustomMarkerById(int markerId) async {
+    final db = await database;
+    final results = await db.query(
+      'custom_markers',
+      where: 'marker_id = ?',
+      whereArgs: [markerId],
+      limit: 1,
+    );
+    
+    return results.isNotEmpty ? results.first : null;
+  }
+
+  /// Atualiza um marcador
+  Future<int> updateCustomMarker(
+    int markerId,
+    Map<String, dynamic> data,
+  ) async {
+    final db = await database;
+    return await db.update(
+      'custom_markers',
+      data,
+      where: 'marker_id = ?',
+      whereArgs: [markerId],
+    );
+  }
+
+  /// Deleta um marcador
+  Future<void> deleteCustomMarker(int markerId) async {
+    final db = await database;
+    await db.delete(
+      'custom_markers',
+      where: 'marker_id = ?',
+      whereArgs: [markerId],
+    );
+  }
+
+  /// Busca marcadores por categoria
+  Future<List<Map<String, dynamic>>> getCustomMarkersByCategory(
+    int userId,
+    String category,
+  ) async {
+    final db = await database;
+    return await db.query(
+      'custom_markers',
+      where: 'user_id = ? AND category = ?',
+      whereArgs: [userId, category],
+      orderBy: 'created_at DESC',
+    );
+  }
+
+  /// Busca marcadores favoritos
+  Future<List<Map<String, dynamic>>> getFavoriteCustomMarkers(
+    int userId,
+  ) async {
+    final db = await database;
+    return await db.query(
+      'custom_markers',
+      where: 'user_id = ? AND is_favorite = 1',
+      whereArgs: [userId],
+      orderBy: 'created_at DESC',
+    );
+  }
+
+  /// Toggle favorito em marcador personalizado
+  Future<void> toggleCustomMarkerFavorite(int markerId) async {
+    final db = await database;
+    
+    // Busca estado atual
+    final marker = await getCustomMarkerById(markerId);
+    if (marker == null) return;
+    
+    final isFavorite = (marker['is_favorite'] as int) == 1;
+    
+    // Inverte o estado
+    await db.update(
+      'custom_markers',
+      {'is_favorite': isFavorite ? 0 : 1},
+      where: 'marker_id = ?',
+      whereArgs: [markerId],
+    );
+  }
+
+  /// Conta total de marcadores de um usuário
+  Future<int> countUserCustomMarkers(int userId) async {
+    final db = await database;
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) as count FROM custom_markers WHERE user_id = ?',
+      [userId],
+    );
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
+
+  /// Busca marcadores próximos a uma coordenada
+  Future<List<Map<String, dynamic>>> getNearbyCustomMarkers(
+    int userId,
+    double latitude,
+    double longitude,
+    double radiusKm,
+  ) async {
+    final db = await database;
+    
+    // Fórmula de Haversine simplificada para filtro inicial
+    // 1 grau ~ 111km
+    final latDelta = radiusKm / 111.0;
+    final lngDelta = radiusKm / (111.0 * math.cos(latitude * math.pi / 180.0));
+    
+    return await db.query(
+      'custom_markers',
+      where: '''
+        user_id = ? AND
+        latitude BETWEEN ? AND ? AND
+        longitude BETWEEN ? AND ?
+      ''',
+      whereArgs: [
+        userId,
+        latitude - latDelta,
+        latitude + latDelta,
+        longitude - lngDelta,
+        longitude + lngDelta,
+      ],
+    );
+  }
+}

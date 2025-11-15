@@ -8,6 +8,7 @@ class AppTheme {
   // Cores que permanecerão as mesmas em ambos os temas para consistência de marca
   static const Color primaryColor = Color(0xFF2563EB); // Azul
   static const Color secondaryColor = Color(0xFF1E40AF); // Azul escuro
+  static const Color tertiaryColor = Color(0xFF2BAD26); // Verde claro para destaques
   static const Color accentColor = Color(0xFFF59E0B); // Laranja de destaque
   
   // Cores de categorias (mantidas para ambos os temas)

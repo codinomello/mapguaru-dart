@@ -4,6 +4,7 @@ import '../utils/constants.dart';
 import '../utils/theme.dart';
 import '../main.dart';
 import '../screens/map_screen.dart';
+import '../services/auth_service.dart';
 
 /// Tela de menu inicial
 class MenuScreen extends StatefulWidget { 
@@ -15,6 +16,7 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateMixin {
   bool _mapExpanded = false;
+  bool _isLoading = false;
   late AnimationController _animationController;
   late Animation<double> _mapHeightAnimation;
   
@@ -37,13 +39,12 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
     );
     
     _mapHeightAnimation = Tween<double>(
-      begin: 300.0, // Altura inicial um pouco maior
-      end: 750.0,   // Altura expandida
+      begin: 300.0,
+      end: 750.0,
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
-    // --- FIM DA INICIALIZAÇÃO DA ANIMAÇÃO ---
   }
 
   @override
@@ -61,10 +62,59 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
     await _animationController.forward();
     
     if (mounted) {
-      Navigator.of(context).pushReplacement(
+      Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => const MapScreen()),
-      );
+      ).then((_) {
+        // when returning from map, reverse the animation and collapse
+        if (mounted) {
+          setState(() => _mapExpanded = false);
+          _animationController.reverse();
+        }
+      });
     }
+  }
+
+  /// Login anônimo
+  Future<void> _handleAnonymousLogin() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      final credential = await authService.signInAnonymously();
+
+      if (credential != null && mounted) {
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        
+        // Login como visitante anônimo
+        await userProvider.login(
+          0, // ID 0 para anônimos
+          'Visitante',
+          'anonimo@mapguaru.app',
+        );
+
+        _showSnackBar('Entrando como visitante...', isError: false);
+
+        Navigator.of(context).pushReplacementNamed(
+          AppConstants.routeMainMenu,
+        );
+      } else if (mounted) {
+        _showSnackBar('Erro ao entrar como visitante');
+      }
+    } catch (e) {
+      if (mounted) _showSnackBar('Erro ao acessar o app');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showSnackBar(String message, {bool isError = true}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? AppTheme.error : AppTheme.success,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override
@@ -97,8 +147,8 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
         return GestureDetector(
           onTap: _mapExpanded ? null : _expandMapAndNavigate,
           child: Container(
-            height: _mapExpanded ? _mapHeightAnimation.value : 350, // Altura inicial
-            width: double.infinity, // Ocupar toda a largura
+            height: _mapExpanded ? _mapHeightAnimation.value : 350,
+            width: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
@@ -121,7 +171,7 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
                   child: Opacity(
                     opacity: 0.2,
                     child: CustomPaint(
-                      painter: MapPatternPainter(), // A classe do Painter está abaixo
+                      painter: MapPatternPainter(),
                     ),
                   ),
                 ),
@@ -132,13 +182,13 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color.fromRGBO(255, 255, 255, 0.2),
+                          color: const Color.fromARGB(51, 0, 0, 0),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           _mapExpanded ? Icons.map : Icons.location_on,
-                          size: 80,
-                          color: Colors.white,
+                          size: 70,
+                          color: Theme.of(context).scaffoldBackgroundColor,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -152,53 +202,92 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        _mapExpanded
-                            ? 'Aguarde um momento'
-                            : 'Descubra os pontos da cidade', // Subtítulo
-                        style: const TextStyle(
-                          fontFamily: 'Helvetica',
-                          fontSize: 16, // Aumentado
-                          color: Colors.white70,
-                        ),
-                      ),
                     ],
                   ),
                 ),
                 if (!_mapExpanded)
                   Positioned(
-                    bottom: 20,
-                    left: 0,
-                    right: 0,
+                    bottom: 24,
+                    left: 24,
+                    right: 24,
                     child: Center(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(20),
+                      child: ElevatedButton(
+                        onPressed: _mapExpanded ? null : _expandMapAndNavigate,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                          foregroundColor: AppTheme.primaryColor,
+                          elevation: 6,
+                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          side: BorderSide(color: Colors.white.withOpacity(0.06)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              Icons.touch_app,
-                              color: AppTheme.primaryColor,
-                              size: 20,
-                            ),
-                            SizedBox(width: 16),
-                            Text(
-                              'Toque para explorar',
-                              style: TextStyle(
-                                fontFamily: 'Helvetica',
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
                                 color: AppTheme.primaryColor,
+                                shape: BoxShape.circle,
+                                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 6, offset: const Offset(0,2))],
+                              ),
+                              child: const Icon(Icons.explore, color: Colors.white, size: 22),
+                            ),
+                            const SizedBox(width: 14),
+                            // constrain text area to avoid overflow on small screens
+                            Flexible(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'Toque para explorar',
+                                    style: TextStyle(fontFamily: 'Helvetica', fontSize: 16, fontWeight: FontWeight.w700, color: Theme.of(context).textTheme.bodyLarge?.color),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Descubra pontos e rotas na cidade',
+                                    style: TextStyle(fontSize: 12, color: Theme.of(context).textTheme.bodySmall?.color),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
                               ),
                             ),
-                            SizedBox(width: 16),
+                            const SizedBox(width: 12),
+                            Icon(Icons.chevron_right, color: Theme.of(context).iconTheme.color),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Top-left badge with city and count
+                if (!_mapExpanded)
+                  Positioned(
+                    top: 18,
+                    left: 18,
+                    child: Card(
+                      elevation: 4,
+                      color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.95),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.location_city, color: AppTheme.primaryColor, size: 18),
+                            const SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Guarulhos', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                                const SizedBox(height: 2),
+                                Text('Mapa interativo', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -214,74 +303,120 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
 
   /// Botões de Ação
   Widget _buildActionButtons(BuildContext context) {
+    final primaryStyle = ElevatedButton.styleFrom(
+      backgroundColor: AppTheme.tertiaryColor,
+      foregroundColor: Colors.white,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      minimumSize: const Size.fromHeight(50),
+    );
+
+    final secondaryElevated = ElevatedButton.styleFrom(
+      backgroundColor: AppTheme.primaryColor,
+      foregroundColor: Colors.white,
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      minimumSize: const Size.fromHeight(50),
+    );
+
+    final subtleElevated = ElevatedButton.styleFrom(
+      backgroundColor: AppTheme.accentColor,
+      foregroundColor: Colors.white,
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      minimumSize: const Size.fromHeight(50),
+    );
+
     return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        children: [
-          const SizedBox(height: 24), // Espaço após o mapa
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(AppConstants.routeLogin);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryColor,
-                foregroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+      child: Card(
+        elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(18.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // header
+              Row(
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.explore, color: AppTheme.primaryColor),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Bem-vindo', style: Theme.of(context).textTheme.titleLarge),
+                        const SizedBox(height: 4),
+                        Text('Encontre serviços públicos e rotas pela cidade', style: Theme.of(context).textTheme.bodyMedium),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              child: const Text(
-                  style: TextStyle(
+              const SizedBox(height: 18),
+
+              // Primary login
+              ElevatedButton(
+                onPressed: _isLoading ? null : () { Navigator.of(context).pushNamed(AppConstants.routeLogin); },
+                style: primaryStyle,
+                child: const Text('Fazer login', style: TextStyle(fontFamily: 'Helvetica', fontSize: 16)),
+              ),
+              const SizedBox(height: 12),
+
+              // Secondary register (Elevated)
+              ElevatedButton(
+                onPressed: _isLoading ? null : () { Navigator.of(context).pushNamed(AppConstants.routeRegister); },
+                style: secondaryElevated,
+                child: const Text('Realizar cadastro', style: TextStyle(fontFamily: 'Helvetica', fontSize: 16)),
+              ),
+              const SizedBox(height: 12),
+
+              // Divider with label
+              Row(children: [const Expanded(child: Divider()), const SizedBox(width: 12), Text('OU', style: TextStyle(fontWeight: FontWeight.w600)), const SizedBox(width: 12), const Expanded(child: Divider())]),
+              const SizedBox(height: 12),
+
+              // Anonymous / visitor entry (Elevated subtle)
+              ElevatedButton.icon(
+                onPressed: _isLoading ? null : _handleAnonymousLogin,
+                icon: _isLoading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.person_outline),
+                label: Text(_isLoading ? 'Entrando...' : 'Entrar como visitante',
+                style: const TextStyle(
                   fontFamily: 'Helvetica',
-                  fontSize: 16,
-                ),
-                'Fazer login'),
-            ),
-          ),
-          
-          const SizedBox(height: 14),
-          
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: OutlinedButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(AppConstants.routeRegister);
-              },
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppTheme.primaryColor,
-                side: const BorderSide(color: AppTheme.primaryColor, width: 2),
+                  fontSize: 16
+                )),
+                style: subtleElevated,
               ),
-              child: const Text(
-                style: TextStyle(
-                  fontFamily: 'Helvetica',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600
+
+              const SizedBox(height: 14),
+
+              // Info sobre visitante
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.info.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppTheme.info.withOpacity(0.22), width: 1),
                 ),
-                'Realizar cadastro'),
-            ),
-          ),
-          
-          const SizedBox(height: 16),
-          
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pushReplacementNamed(
-                AppConstants.routeMainMenu,
-              );
-            },
-            child: Text(
-              'Acessar como visitante',
-              style: TextStyle(
-                fontFamily: 'Helvetica',
-                fontSize: 16,
-                color: AppTheme.primaryColor,
-                decoration: TextDecoration.underline,
-                decorationColor: Theme.of(context).textTheme.bodyMedium?.color,
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: AppTheme.info, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(child: Text('Como visitante, você pode explorar o app mas não salvar favoritos.', style: TextStyle(fontFamily: 'Helvetica', fontSize: 12, color: Theme.of(context).textTheme.bodyMedium?.color, height: 1.4))),
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
